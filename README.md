@@ -1,5 +1,6 @@
 # OARD : An Open Real-world based Annotation for Rare Diseases and its Associated Phenotypes
-This is a React web app to serve the web app of OARD. The backend is provided by OARD Api.
+This is a React web app to serve the web app of OARD. The backend is provided by OARD Api. Currently it is hosted on the 
+[NCATS AWS server (https://rare.cohd.io/)](https://rare.cohd.io/)
 
 
 ## Requirements
