@@ -3,7 +3,6 @@ import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -13,12 +12,8 @@ import FormHelperText from '@mui/material/FormHelperText';
 import List from '@mui/material/List';
 import ListSubheader from '@mui/material/ListSubheader';
 import Button from '@mui/material/Button';
-import SearchComp from './search';
-import DatasetComp from './dataset';
-import AdvancedComp from './advanced';
-import FormComp from './form'
-import { ListItem } from '@mui/material';
 import SinelgResultDisplayComp from './singleresult'
+import { Grid } from '@mui/material';
 
 
 
@@ -289,7 +284,7 @@ class MainComp extends Component {
         }
 
         return (
-            <Container>
+            <Grid container justifyContent="center">
                 <Box sx={{ padding: 2 }}>
                     <Box sx={{ padding: 2 }}>
                         <Autocomplete
@@ -478,7 +473,7 @@ class MainComp extends Component {
 
 
 
-            </Container>
+            </Grid>
         );
     }
 }

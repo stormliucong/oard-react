@@ -29,6 +29,8 @@ server {
         
 }
 ```
+## Reference
+https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project
 
 ## To Do List
 1. Create tables for different analysis

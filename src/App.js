@@ -1,15 +1,18 @@
 import React from "react";
 import './App.css'
-import NavBarComp from './components/navbar'
+import AppBarComp from './components/appbar'
 import MainComp from './components/main'
-import IntroComp from "./components/intro";
+import CardComp from "./components/card";
+import { Grid } from '@mui/material';
 
 function App() {
   return (
     <React.Fragment>
-      <NavBarComp />
-      <IntroComp />
-      <MainComp />
+      <Grid container spacing={2} direction="column" justifyContent="center">
+        <AppBarComp />
+        <CardComp />
+        <MainComp />
+      </Grid>
     </React.Fragment>
   );
 }
