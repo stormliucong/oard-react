@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## To Do List
+1. Create tables for different analysis
+2. Check forms and different results display flag.
+3. Clean up nav and headers
+4. Deploy on NCATS server
+5. Publish in Github
+
 ## Available Scripts
 
 In the project directory, you can run:

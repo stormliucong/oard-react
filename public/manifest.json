@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "OARD App",
+  "name": "OARD: An Open Real-world based Annotation for Rare Diseases and its Associated Phenotypes",
   "icons": [
     {
       "src": "favicon.ico",

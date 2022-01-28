@@ -1,0 +1,23 @@
+.suggestion{
+    cursor: pointer;
+    border-right: 1px solid;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
+}
+
+.suggestion:hover{
+    background-color: grey;
+}
+
+.hpid{
+    font-size: smaller;
+    color: grey;
+    border-right: 2px;
+    border-left: 2px;
+
+}
+
+.hpname{
+    font-size: smaller;
+    color: black;
+}
