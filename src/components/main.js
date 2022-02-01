@@ -13,7 +13,17 @@ import List from '@mui/material/List';
 import ListSubheader from '@mui/material/ListSubheader';
 import Button from '@mui/material/Button';
 import SinelgResultDisplayComp from './singleresult'
+import DsHelperComp from './datasethelper'
 import { Grid } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import IconButton from '@mui/material/IconButton';
+import Modal from '@mui/material/Modal';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 
@@ -30,7 +40,7 @@ class MainComp extends Component {
                 "name": "Muscle weakness",
                 "id": "HP:0001324",
                 "group": "HPO PHENOTYPE"
-               
+
             },
             {
                 "name": "Skeletal muscle atrophy",
@@ -39,6 +49,7 @@ class MainComp extends Component {
             }],
         queryConceptList1: [],
         queryConceptList2: [],
+        dtHelperOpen: false,
         dataset: "1",
         domain: "phenotypes",
         topN: "25",
@@ -46,7 +57,7 @@ class MainComp extends Component {
         apiMethod: "mostFrequency",
         apiResultsDisplayService: "frequencies",
         apiResultsDisplayMethod: "mostFrequency",
-        apiSelectableMethod: ['singleConceptFreq','pairedConceptFreq','mostFrequency'],
+        apiSelectableMethod: ['singleConceptFreq', 'pairedConceptFreq', 'mostFrequency'],
         apiResultsDisplay: false,
         submitError: false,
         submitHelperText: '',
@@ -144,30 +155,30 @@ class MainComp extends Component {
                 rows: 50
             }
         });
-        this.setState({ querySugList: []})
+        this.setState({ querySugList: [] })
         var resultList = response.data.response.docs
-        if(resultList.length > 0){
+        if (resultList.length > 0) {
             resultList.forEach((doc) => {
                 var term = {}
-                if(doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:')){
-                    
-                    term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE':'HPO Phenotype'
+                if (doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:')) {
+
+                    term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE' : 'HPO Phenotype'
                     term.label = doc.label
                     term.id = doc.obo_id
                     const idExist = this.state.querySugList.find(element => {
                         if (element.id === term.id) {
-                          return true;
+                            return true;
                         }
                     });
-                    if(idExist === undefined){
-                        this.setState({ querySugList: [...this.state.querySugList, term]})
+                    if (idExist === undefined) {
+                        this.setState({ querySugList: [...this.state.querySugList, term] })
                     }
-                }         
+                }
             });
         }
     }
 
-    processResponse = (response)=>{
+    processResponse = (response) => {
         return response.data.terms
     }
 
@@ -181,7 +192,7 @@ class MainComp extends Component {
         });
         var list = this.processResponse(response)
         console.log(list)
-        this.setState({querySugList: list})
+        this.setState({ querySugList: list })
     }
 
     handleDialogClose = (event, reason) => {
@@ -190,7 +201,15 @@ class MainComp extends Component {
         }
     }
 
-    handleSubmit = async () =>{
+    handleDtHelperOpen = () => {
+        this.setState({ dtHelperOpen: true });
+    }
+    handleDtHelperClose = () => {
+        this.setState({ dtHelperOpen: false });
+    }
+
+
+    handleSubmit = async () => {
         var conceptIdList1 = []
         var conceptIdList2 = []
         console.log(this.state.apiMethod)
@@ -198,7 +217,7 @@ class MainComp extends Component {
         //     submitHelperText: this.state.apiMethod === '' ? 'No method provided!' : '',
         //     submitError: this.state.apiMethod === '' ? true : false
         // })
-        if(this.state.queryConceptList1.length && !this.state.submitError){
+        if (this.state.queryConceptList1.length && !this.state.submitError) {
             const queryList1 = this.state.queryConceptList1.map((concept) => concept.id)
             var response1 = await axios.get('https://rare.cohd.io//api/vocabulary/findConceptByCode', {
                 params: {
@@ -211,7 +230,7 @@ class MainComp extends Component {
                 submitError: conceptIdList1.length ? false : true
             })
         }
-        if(this.state.queryConceptList2.length && !this.state.submitError){
+        if (this.state.queryConceptList2.length && !this.state.submitError) {
             const queryList2 = this.state.queryConceptList2.map((concept) => concept.id)
             var response2 = await axios.get('https://rare.cohd.io//api/vocabulary/findConceptByCode', {
                 params: {
@@ -224,10 +243,9 @@ class MainComp extends Component {
                 submitError: conceptIdList2.length ? false : true
             })
         }
-        
+
         if (!this.state.submitError) {
-            console.log(this.state.domain)
-            if(this.state.domain === 'all'){
+            if (this.state.domain === 'all') {
                 var response = await axios.get('https://rare.cohd.io//api/' + this.state.apiService + '/' + this.state.apiMethod, {
                     params: {
                         dataset_id: parseInt(this.state.dataset),
@@ -238,7 +256,7 @@ class MainComp extends Component {
                         top_n: parseInt(this.state.topN)
                     }
                 });
-            }else{
+            } else {
                 var response = await axios.get('https://rare.cohd.io//api/' + this.state.apiService + '/' + this.state.apiMethod, {
                     params: {
                         dataset_id: parseInt(this.state.dataset),
@@ -251,36 +269,38 @@ class MainComp extends Component {
                     }
                 });
             }
-            
-            this.setState({apiResults: response.data.results, 
+
+            this.setState({
+                apiResults: response.data.results,
                 apiResultsDisplayService: this.state.apiService,
                 apiResultsDisplayMethod: this.state.apiMethod,
-                apiResultsDisplay: true})
+                apiResultsDisplay: true
+            })
         }
     }
 
     render() {
 
 
-        if(this.state.apiService == 'frequencies'){
-            var methodSelectOption = 
+        if (this.state.apiService == 'frequencies') {
+            var methodSelectOption =
                 <Select
                     value={this.state.apiMethod}
                     label="method"
                     onChange={(event) => this.setState({ apiMethod: event.target.value })
                     }
                 >
-                    
-                    <MenuItem sx={{display: (this.state.queryConceptList1.length && !this.state.queryConceptList2.length) ? "block": "none"}} 
-                    value="singleConceptFreq">singleConceptFreq</MenuItem>
-                    <MenuItem sx={{display: (this.state.queryConceptList1.length && this.state.queryConceptList2.length )? "block": "none"}}
-                    value="pairedConceptFreq">pairedConceptFreq</MenuItem>
-                    <MenuItem sx={{display: (this.state.queryConceptList1.length <= 1 && !this.state.queryConceptList2.length) ? "block": "none"}}
-                    value="mostFrequency">mostFrequency</MenuItem>
+
+                    <MenuItem sx={{ display: (this.state.queryConceptList1.length && !this.state.queryConceptList2.length) ? "block" : "none" }}
+                        value="singleConceptFreq">singleConceptFreq</MenuItem>
+                    <MenuItem sx={{ display: (this.state.queryConceptList1.length && this.state.queryConceptList2.length) ? "block" : "none" }}
+                        value="pairedConceptFreq">pairedConceptFreq</MenuItem>
+                    <MenuItem sx={{ display: (this.state.queryConceptList1.length <= 1 && !this.state.queryConceptList2.length) ? "block" : "none" }}
+                        value="mostFrequency">mostFrequency</MenuItem>
                 </Select>;
-            
-        }else{
-            var methodSelectOption = 
+
+        } else {
+            var methodSelectOption =
                 <Select
                     value={this.state.apiMethod}
                     label="method"
@@ -330,7 +350,7 @@ class MainComp extends Component {
                                     <Box sx={{
                                         border: 0,
                                         fontSize: 'smaller'
-                                        }}> {option.name} </Box> 
+                                    }}> {option.name} </Box>
                                     <Box sx={{
                                         border: 0,
                                         fontWeight: 'light',
@@ -339,7 +359,7 @@ class MainComp extends Component {
                                         color: 'grey',
                                         m: 2,
                                         fontSize: 'smaller'
-                                        }}>{option.id}</Box>
+                                    }}>{option.id}</Box>
                                 </Box>
                             )}
                             renderInput={(params) => (
@@ -353,7 +373,7 @@ class MainComp extends Component {
                         />
                     </Box>
                     <Box sx={{ padding: 2 }}>
-                    <Autocomplete
+                        <Autocomplete
                             disablePortal
                             multiple
                             id="combo-box-demo"
@@ -380,7 +400,7 @@ class MainComp extends Component {
                                     <Box sx={{
                                         border: 0,
                                         fontSize: 'smaller'
-                                        }}> {option.name} </Box> 
+                                    }}> {option.name} </Box>
                                     <Box sx={{
                                         border: 0,
                                         fontWeight: 'light',
@@ -389,7 +409,7 @@ class MainComp extends Component {
                                         color: 'grey',
                                         m: 2,
                                         fontSize: 'smaller'
-                                        }}>{option.id}</Box>
+                                    }}>{option.id}</Box>
                                 </Box>
                             )}
                             renderInput={(params) => (
@@ -405,21 +425,37 @@ class MainComp extends Component {
                     <Box sx={{ padding: 2, textAlign: 'center' }} >
                         <Container sx={{ display: 'flex' }}>
                             <FormControl sx={{ m: 1, minWidth: 120 }}>
-                                <InputLabel>Dataset</InputLabel>
-                                <Select 
+
+                                <InputLabel>Dataset<InfoIcon onClick={this.handleDtHelperOpen}></InfoIcon></InputLabel>
+                                <Dialog
+                                    fullWidth={true}
+                                    open={this.state.dtHelperOpen}
+                                    onClose={this.handleDtHelperClose}
+                                >
+                                    <DialogTitle id="alert-dialog-title">
+                                    {"Use data select Helper"}
+                                    </DialogTitle>
+                                     <DialogContent>
+                                    <DsHelperComp />
+                                    </DialogContent></Dialog>
+                                
+                                <Select
                                     value={this.state.dataset}
                                     label="Dataset"
                                     onChange={(event) => this.setState({ dataset: event.target.value })
                                     }
                                 >
+
+
                                     <MenuItem value="1">1 - CUIMC/OHDSI</MenuItem>
                                     <MenuItem value="2">2 - CHOP/Notes</MenuItem>
                                     <MenuItem value="3">3 - CUIMC/Solr</MenuItem>
                                 </Select>
                             </FormControl>
+                            
                             <FormControl sx={{ m: 1, minWidth: 120 }}>
                                 <InputLabel>Domain</InputLabel>
-                                <Select 
+                                <Select
                                     value={this.state.domain}
                                     label="Domain"
                                     onChange={(event) => this.setState({ domain: event.target.value })
@@ -433,7 +469,7 @@ class MainComp extends Component {
                             <FormControl sx={{ m: 1, minWidth: 120 }}>
 
                                 <InputLabel>Return </InputLabel>
-                                <Select 
+                                <Select
                                     value={this.state.topN}
                                     label="Top N"
                                     onChange={(event) => this.setState({ topN: event.target.value })
@@ -447,16 +483,18 @@ class MainComp extends Component {
                             </FormControl>
                             <FormControl sx={{ m: 1, minWidth: 120 }}>
                                 <InputLabel>Service</InputLabel>
-                                <Select 
-                                    value={this.state.queryConceptList1.length ? this.state.apiService: "frequencies"}
+                                <Select
+                                    value={this.state.queryConceptList1.length ? this.state.apiService : "frequencies"}
                                     label="service"
-                                    onChange={(event) => this.setState({ apiService: event.target.value, 
-                                        apiMethod: event.target.value=='frequencies' ? 'mostFrequency' : 'jaccardIndex' })
+                                    onChange={(event) => this.setState({
+                                        apiService: event.target.value,
+                                        apiMethod: event.target.value == 'frequencies' ? 'mostFrequency' : 'jaccardIndex'
+                                    })
                                     }
                                 >
                                     <MenuItem value="frequencies">frequencies</MenuItem>
                                     <MenuItem value="association" sx={{
-                                        display: this.state.queryConceptList1.length ? "inline": "none"
+                                        display: this.state.queryConceptList1.length ? "inline" : "none"
                                     }}>association</MenuItem>
                                 </Select>
                             </FormControl>
@@ -465,7 +503,7 @@ class MainComp extends Component {
                                 {methodSelectOption}
                             </FormControl>
                             <FormControl sx={{ m: 1, minWidth: 120 }} error={this.state.submitError}>
-                                <Button onClick={this.handleSubmit} size="large" sx={{textAlign: 'right-center', float: 'right', height:57 }}>Submit</Button>
+                                <Button onClick={this.handleSubmit} size="large" sx={{ textAlign: 'right-center', float: 'right', height: 57 }}>Submit</Button>
                                 <FormHelperText>{this.state.submitHelperText}</FormHelperText>
                             </FormControl>
                         </Container>
@@ -473,16 +511,16 @@ class MainComp extends Component {
                 </Box>
                 <Box sx={{ padding: 2 }}>
                     <List component="nav" aria-label="mailbox folders">
-                    {this.state.apiResultsDisplay &&
-                    <ListSubheader>
-                        {this.state.apiResults.length} Results returned
-                    </ListSubheader>
-                    }
-                    {this.state.apiResultsDisplay && 
-                    this.state.apiResults.map((result,i) => 
-                        <SinelgResultDisplayComp key={i} result={result} service={this.state.apiResultsDisplayService} method={this.state.apiResultsDisplayMethod}>{i}</SinelgResultDisplayComp>
-                        )
-                    }
+                        {this.state.apiResultsDisplay &&
+                            <ListSubheader>
+                                {this.state.apiResults.length} Results returned
+                            </ListSubheader>
+                        }
+                        {this.state.apiResultsDisplay &&
+                            this.state.apiResults.map((result, i) =>
+                                <SinelgResultDisplayComp key={i} result={result} service={this.state.apiResultsDisplayService} method={this.state.apiResultsDisplayMethod}>{i}</SinelgResultDisplayComp>
+                            )
+                        }
                     </List>
                 </Box>
 
