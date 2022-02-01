@@ -226,16 +226,32 @@ class MainComp extends Component {
         }
         
         if (!this.state.submitError) {
-            var response = await axios.get('https://rare.cohd.io//api/' + this.state.apiService + '/' + this.state.apiMethod, {
-                params: {
-                    dataset_id: parseInt(this.state.dataset),
-                    concept: conceptIdList1.join(';'),
-                    concept_id: conceptIdList1.join(';'),
-                    concept_id_1: conceptIdList1.join(';'),
-                    concept_id_2: conceptIdList2.join(';'),
-                    top_n: parseInt(this.state.topN)
-                }
-            });
+            console.log(this.state.domain)
+            if(this.state.domain === 'all'){
+                var response = await axios.get('https://rare.cohd.io//api/' + this.state.apiService + '/' + this.state.apiMethod, {
+                    params: {
+                        dataset_id: parseInt(this.state.dataset),
+                        concept: conceptIdList1.join(';'),
+                        concept_id: conceptIdList1.join(';'),
+                        concept_id_1: conceptIdList1.join(';'),
+                        concept_id_2: conceptIdList2.join(';'),
+                        top_n: parseInt(this.state.topN)
+                    }
+                });
+            }else{
+                var response = await axios.get('https://rare.cohd.io//api/' + this.state.apiService + '/' + this.state.apiMethod, {
+                    params: {
+                        dataset_id: parseInt(this.state.dataset),
+                        concept: conceptIdList1.join(';'),
+                        concept_id: conceptIdList1.join(';'),
+                        concept_id_1: conceptIdList1.join(';'),
+                        concept_id_2: conceptIdList2.join(';'),
+                        top_n: parseInt(this.state.topN),
+                        domain_id: this.state.domain
+                    }
+                });
+            }
+            
             this.setState({apiResults: response.data.results, 
                 apiResultsDisplayService: this.state.apiService,
                 apiResultsDisplayMethod: this.state.apiMethod,
