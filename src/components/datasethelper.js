@@ -1,63 +1,70 @@
-import * as React from "react";
+import React, { Component } from 'react';
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
+import { render } from "@testing-library/react";
+import axios from 'axios';
+import { csv } from 'csvtojson';
 
-var csv = require("csvtojson");
 
-// function csvJSON(csv){
-//   console.log(csv)
+class DsHelperComp extends Component {
+  state = {
+    rows: null,
+    columns:
+      [
+        { field: "id", hide: true },
+        { field: "dataset_id", headerName: "dataset_id", width: 100 },
+        { field: "clinical_site", headerName: "clinical_site", width: 150 },
+        { field: "source", headerName: "source", width: 150 },
+        { field: "subclass_category", headerName: "subclass_category", width: 150 },
+      ]
+  }
+  
 
-//   var lines=csv.split("\n");
+  getFile = async () => {
+    try {
+      // generate a request
+      const ax = axios.create({
+        baseURL: 'http://localhost:3000/'
+      })
+      let res1 = await ax.get('/dataset.csv');
+      // convert the csv to json with the package
+      csv({
+        noheader: false,
+        output: "csv"
+      })
+        .fromString(res1.data)
+        .then((csvRow) => {
+          console.log(csvRow);
+          // add the JSON to the state
+          this.setState({
+            rows: csvRow.map((row, i) => {
+              return {
+                "id": i,
+                "dataset_id": row[0],
+                "clinical_site": row[1],
+                "source": row[2],
+                "subclass_category": row[3]
+              }
+            }
+            )
+          })
+        })
+      } catch (err) {
+      console.error(err);
+    }
+  }
 
-//   var result = [];
-
-//   // NOTE: If your columns contain commas in their values, you'll need
-//   // to deal with those before doing the next step 
-//   // (you might convert them to &&& or something, then covert them back later)
-//   // jsfiddle showing the issue https://jsfiddle.net/
-//   var headers=lines[0].split(",");
-
-//   for(var i=1;i<lines.length;i++){
-
-//       var obj = {};
-//       var currentline=lines[i].split(",");
-
-//       for(var j=0;j<headers.length;j++){
-//           obj['id'] = i;
-//           obj[headers[j]] = currentline[j];
-//       }
-
-//       result.push(obj);
-
-//   }
-//   console.log(result)
-
-//   //return result; //JavaScript object
-//   return JSON.stringify(result); //JSON
-// }
-// const rows = csv().fromFile('/dataset.csv');
-// console.log(rows)
-
-const rows = [
-  { id: 1, dataset_id: "1", clinical_site: "cuimc", source: "ohdsi", subclass_category: 'all' },
-  { id: 2, dataset_id: "2", clinical_site: "cuimc", source: "ohdsi", subclass_category: 'all' },
-  { id: 3, dataset_id: "3", clinical_site: "chop", source: "notes", subclass_category: 'all' },
-  { id: 4, dataset_id: "10", clinical_site: "cuimc", source: "ohdsi", subclass_category: 'neonates (0-2)' },
-  { id: 5, dataset_id: "11", clinical_site: "cuimc", source: "ohdsi", subclass_category: 'kid (3-11)' },
-  { id: 6, dataset_id: "12", clinical_site: "cuimc", source: "ohdsi", subclass_category: 'teenage (2-17)' }
-]
-
-const columns = [
-  { field: "id", hide: true },
-  { field: "dataset_id",headerName: "dataset_id",width: 100 },
-  { field: "clinical_site",headerName: "clinical_site",width: 150 },
-  { field: "source",headerName: "source",width: 150 },
-  { field: "subclass_category",headerName: "subclass_category",width: 150 },
-];
-
-export default function DsHelperComp() {
-  return (
-    <div style={{ height: 500, width: "100%" }}>
-      <DataGrid rows={rows} columns={columns} />
-    </div>
-  );
+  //load only once.
+  componentDidMount(){
+    this.getFile();
+  }
+  render() {
+   
+    return (
+      <div style={{ height: 500, width: "100%" }}>
+        <DataGrid rows={this.state.rows} columns={this.state.columns} />
+      </div >
+    );
+  }
 }
+
+export default DsHelperComp;
