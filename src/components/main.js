@@ -14,6 +14,7 @@ import ListSubheader from '@mui/material/ListSubheader';
 import Button from '@mui/material/Button';
 import SinelgResultDisplayComp from './singleresult'
 import DsHelperComp from './datasethelper'
+import DsSelectComp from './datasetselect'
 import { Grid } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import IconButton from '@mui/material/IconButton';
@@ -182,6 +183,10 @@ class MainComp extends Component {
         return response.data.terms
     }
 
+    handleDatasetSelectChange = (ds) => {
+        this.setState({dataset: ds})
+    }
+
     loadConcepts = async () => {
         const query = this.state.queryText
         console.log(query)
@@ -278,6 +283,7 @@ class MainComp extends Component {
             })
         }
     }
+
 
     render() {
 
@@ -424,7 +430,7 @@ class MainComp extends Component {
                     </Box>
                     <Box sx={{ padding: 2, textAlign: 'center' }} >
                         <Container sx={{ display: 'flex' }}>
-                            <FormControl sx={{ m: 1, minWidth: 120 }}>
+                            {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
 
                                 <InputLabel>Dataset<InfoIcon onClick={this.handleDtHelperOpen}></InfoIcon></InputLabel>
                                 <Dialog
@@ -451,7 +457,9 @@ class MainComp extends Component {
                                     <MenuItem value="2">2 - CHOP/Notes</MenuItem>
                                     <MenuItem value="3">3 - CUIMC/Solr</MenuItem>
                                 </Select>
-                            </FormControl>
+                            </FormControl> */}
+
+                            <DsSelectComp handleDatasetSelectChange={this.handleDatasetSelectChange} />
                             
                             <FormControl sx={{ m: 1, minWidth: 120 }}>
                                 <InputLabel>Domain</InputLabel>
