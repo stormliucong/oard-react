@@ -41,8 +41,10 @@ class DsSelectComp extends Component {
   getFile = async () => {
     try {
       // generate a request
+      var getUrl = window.location;
+      var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
       const ax = axios.create({
-        baseURL: 'http://localhost:3000/'
+        baseURL: baseUrl
       })
       let res1 = await ax.get('/dataset.csv');
       // convert the csv to json with the package
