@@ -1,19 +1,19 @@
 ﻿dataset_id,clinical_site,source,subclass_category
 1,cuimc,ohdsi,all
-2,cuimc,ohdsi,all
+2,cuimc,notes,all
 3,chop,notes,all
 10,cuimc,ohdsi,neonates (0-2)
 11,cuimc,ohdsi,kid (3-11)
 12,cuimc,ohdsi,teenage (2-17)
 13,cuimc,ohdsi,adult (18-99)
 20,cuimc,ohdsi,neonates (0-2)
-21,cuimc,ohdsi,kid (3-11)
-22,cuimc,ohdsi,teenage (2-17)
-23,cuimc,ohdsi,adult (18-99)
+21,cuimc,notes,kid (3-11)
+22,cuimc,notes,teenage (2-17)
+23,cuimc,notes,adult (18-99)
 100,cuimc,ohdsi,genetic
 199,cuimc,ohdsi,hierachical
-200,cuimc,ohdsi,genetic
-299,cuimc,ohdsi,hierachical
+200,cuimc,notes,genetic
+299,cuimc,notes,hierachical
 190000119,cuimc,ohdsi,Abnormality of the genitourinary system
 190000152,cuimc,ohdsi,Abnormality of head or neck
 190000478,cuimc,ohdsi,Abnormality of the eye
