@@ -15,7 +15,7 @@ import Button from '@mui/material/Button';
 import SinelgResultDisplayComp from './singleresult'
 import DsHelperComp from './datasethelper'
 import DsSelectComp from './datasetselect'
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import InfoIcon from '@mui/icons-material/Info';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
@@ -200,20 +200,6 @@ class MainComp extends Component {
         this.setState({ querySugList: list })
     }
 
-    handleDialogClose = (event, reason) => {
-        if (reason !== 'backdropClick') {
-            this.setState({ datasetSelectDialogOpen: false });
-        }
-    }
-
-    handleDtHelperOpen = () => {
-        this.setState({ dtHelperOpen: true });
-    }
-    handleDtHelperClose = () => {
-        this.setState({ dtHelperOpen: false });
-    }
-
-
     handleSubmit = async () => {
         var conceptIdList1 = []
         var conceptIdList2 = []
@@ -326,10 +312,14 @@ class MainComp extends Component {
         }
 
         return (
-            <Grid container justifyContent="center">
-                <Box sx={{ padding: 2 }}>
-                    <Box sx={{ padding: 2 }}>
+            <Grid container xs={12} spacing={2} justifyContent="center" p={10}>
+
+                {/* form */}
+                <Grid item xs={12} spacing={5} container justifyContent="space-around">
+                    {/* search box 1 */}
+                    <Grid item xs={12} lg={6} >
                         <Autocomplete
+                        sx={{ display: 'flex' }}
                             disablePortal
                             multiple
                             id="combo-box-demo"
@@ -377,9 +367,12 @@ class MainComp extends Component {
                                 />
                             )}
                         />
-                    </Box>
-                    <Box sx={{ padding: 2 }}>
+                    </Grid>
+
+                    {/* search box 2 */}
+                    <Grid item xs={12} lg={6}>
                         <Autocomplete
+                        sx={{ display: 'flex' }}
                             disablePortal
                             multiple
                             id="combo-box-demo"
@@ -427,98 +420,90 @@ class MainComp extends Component {
                                 />
                             )}
                         />
-                    </Box>
-                    <Box sx={{ padding: 2, textAlign: 'center' }} >
-                        <Container sx={{ display: 'flex' }}>
-                            {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
+                    </Grid>
 
-                                <InputLabel>Dataset<InfoIcon onClick={this.handleDtHelperOpen}></InfoIcon></InputLabel>
-                                <Dialog
-                                    fullWidth={true}
-                                    open={this.state.dtHelperOpen}
-                                    onClose={this.handleDtHelperClose}
-                                >
-                                    <DialogTitle id="alert-dialog-title">
-                                    {"Use data select Helper"}
-                                    </DialogTitle>
-                                     <DialogContent>
-                                    <DsHelperComp />
-                                    </DialogContent></Dialog>
-                                
-                                <Select
-                                    value={this.state.dataset}
-                                    label="Dataset"
-                                    onChange={(event) => this.setState({ dataset: event.target.value })
-                                    }
-                                >
+                    {/* dataset selection */}
+                    <Grid item xs={12} md={6} lg={2}>
+                        <DsSelectComp handleDatasetSelectChange={this.handleDatasetSelectChange} />
+                    </Grid>
 
+                    {/* domain selection */}
+                    <Grid item xs={12} md={6} lg={2}>
+                        <FormControl sx={{ display: 'flex' }}>
+                            <InputLabel>Domain</InputLabel>
+                            <Select
+                                value={this.state.domain}
+                                label="Domain"
+                                onChange={(event) => this.setState({ domain: event.target.value })
+                                }
+                            >
+                                <MenuItem value="all">All</MenuItem>
+                                <MenuItem value="phenotypes">Phenotypes/HPO</MenuItem>
+                                <MenuItem value="diseases">Diseases/Mondo</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
 
-                                    <MenuItem value="1">1 - CUIMC/OHDSI</MenuItem>
-                                    <MenuItem value="2">2 - CHOP/Notes</MenuItem>
-                                    <MenuItem value="3">3 - CUIMC/Solr</MenuItem>
-                                </Select>
-                            </FormControl> */}
+                    {/* return selection */}
+                    <Grid item xs={12} md={6} lg={2}>
+                        <FormControl sx={{ display: 'flex' }}>
 
-                            <DsSelectComp handleDatasetSelectChange={this.handleDatasetSelectChange} />
-                            
-                            <FormControl sx={{ m: 1, minWidth: 120 }}>
-                                <InputLabel>Domain</InputLabel>
-                                <Select
-                                    value={this.state.domain}
-                                    label="Domain"
-                                    onChange={(event) => this.setState({ domain: event.target.value })
-                                    }
-                                >
-                                    <MenuItem value="all">All</MenuItem>
-                                    <MenuItem value="phenotypes">Phenotypes/HPO</MenuItem>
-                                    <MenuItem value="diseases">Diseases/Mondo</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <FormControl sx={{ m: 1, minWidth: 120 }}>
+                            <InputLabel>Return </InputLabel>
+                            <Select
+                                value={this.state.topN}
+                                label="Top N"
+                                onChange={(event) => this.setState({ topN: event.target.value })
+                                }
+                            >
+                                <MenuItem value="10">10</MenuItem>
+                                <MenuItem value="25">25</MenuItem>
+                                <MenuItem value="50">50</MenuItem>
+                                <MenuItem value="100">100</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
 
-                                <InputLabel>Return </InputLabel>
-                                <Select
-                                    value={this.state.topN}
-                                    label="Top N"
-                                    onChange={(event) => this.setState({ topN: event.target.value })
-                                    }
-                                >
-                                    <MenuItem value="10">10</MenuItem>
-                                    <MenuItem value="25">25</MenuItem>
-                                    <MenuItem value="50">50</MenuItem>
-                                    <MenuItem value="100">100</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <FormControl sx={{ m: 1, minWidth: 120 }}>
-                                <InputLabel>Service</InputLabel>
-                                <Select
-                                    value={this.state.queryConceptList1.length ? this.state.apiService : "frequencies"}
-                                    label="service"
-                                    onChange={(event) => this.setState({
-                                        apiService: event.target.value,
-                                        apiMethod: event.target.value == 'frequencies' ? 'mostFrequency' : 'jaccardIndex'
-                                    })
-                                    }
-                                >
-                                    <MenuItem value="frequencies">frequencies</MenuItem>
-                                    <MenuItem value="association" sx={{
-                                        display: this.state.queryConceptList1.length ? "inline" : "none"
-                                    }}>association</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <FormControl sx={{ m: 1, minWidth: 120 }}>
-                                <InputLabel>Method</InputLabel>
-                                {methodSelectOption}
-                            </FormControl>
-                            <FormControl sx={{ m: 1, minWidth: 120 }} error={this.state.submitError}>
-                                <Button onClick={this.handleSubmit} size="large" sx={{ textAlign: 'right-center', float: 'right', height: 57 }}>Submit</Button>
-                                <FormHelperText>{this.state.submitHelperText}</FormHelperText>
-                            </FormControl>
-                        </Container>
-                    </Box>
-                </Box>
-                <Box sx={{ padding: 2 }}>
-                    <List component="nav" aria-label="mailbox folders">
+                    {/* service selection */}
+                    <Grid item xs={12} md={6} lg={2}>
+                        <FormControl sx={{ display: 'flex' }}>
+                            <InputLabel>Service</InputLabel>
+                            <Select
+                                value={this.state.queryConceptList1.length ? this.state.apiService : "frequencies"}
+                                label="service"
+                                onChange={(event) => this.setState({
+                                    apiService: event.target.value,
+                                    apiMethod: event.target.value == 'frequencies' ? 'mostFrequency' : 'jaccardIndex'
+                                })
+                                }
+                            >
+                                <MenuItem value="frequencies">frequencies</MenuItem>
+                                <MenuItem value="association" sx={{
+                                    display: this.state.queryConceptList1.length ? "inline" : "none"
+                                }}>association</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+
+                    {/* method selection */}
+                    <Grid item xs={12} md={6} lg={2}>
+                        <FormControl sx={{ display: 'flex' }}>
+                            <InputLabel>Method</InputLabel>
+                            {methodSelectOption}
+                        </FormControl>
+                    </Grid>
+
+                    {/* submit button */}
+                    <Grid item xs={12} md={6} lg={2} container justifyContent="center">
+                        <FormControl error={this.state.submitError} sx={{ display: 'flex' }}>
+                            <Button variant="contained" onClick={this.handleSubmit} size="large">Submit</Button>
+                            <FormHelperText>{this.state.submitHelperText}</FormHelperText>
+                        </FormControl>
+                    </Grid>
+                </Grid>
+
+                {/* results */}
+                <Grid item xs={12} container justifyContent="space-around">
+                    <List aria-label="mailbox folders" sx={{ display: 'flex',flexDirection:"column",alignItems:"stretch"}}>
                         {this.state.apiResultsDisplay &&
                             <ListSubheader>
                                 {this.state.apiResults.length} Results returned
@@ -530,8 +515,7 @@ class MainComp extends Component {
                             )
                         }
                     </List>
-                </Box>
-
+                </Grid>
 
 
 

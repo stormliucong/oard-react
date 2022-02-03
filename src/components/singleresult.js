@@ -50,7 +50,7 @@ class SinelgResultDisplayComp extends Component {
             }
             
             return (
-                <React.Fragment>
+                <React.Fragment >
                     <Divider />
                     <ListItemButton onClick={this.handleClick}>
                         <ListItemIcon>

@@ -95,7 +95,7 @@ class DsSelectComp extends Component {
   render() {
    
     return (
-        <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <FormControl sx={{ display: 'flex' }}>
 
         <InputLabel>Dataset<InfoIcon onClick={this.handleDtHelperOpen}></InfoIcon></InputLabel>
         <Dialog
