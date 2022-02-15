@@ -1,62 +1,62 @@
-﻿dataset_id,clinical_site,source,subclass_category
-1,cuimc,ohdsi,all
-2,cuimc,notes,all
-3,chop,notes,all
-10,cuimc,ohdsi,neonates (0-2)
-11,cuimc,ohdsi,kid (3-11)
-12,cuimc,ohdsi,teenage (2-17)
-13,cuimc,ohdsi,adult (18-99)
-20,cuimc,ohdsi,neonates (0-2)
-21,cuimc,notes,kid (3-11)
-22,cuimc,notes,teenage (2-17)
-23,cuimc,notes,adult (18-99)
-100,cuimc,ohdsi,genetic
-199,cuimc,ohdsi,hierachical
-200,cuimc,notes,genetic
-299,cuimc,notes,hierachical
-190000119,cuimc,ohdsi,Abnormality of the genitourinary system
-190000152,cuimc,ohdsi,Abnormality of head or neck
-190000478,cuimc,ohdsi,Abnormality of the eye
-190000598,cuimc,ohdsi,Abnormality of the ear
-190000707,cuimc,ohdsi,Abnormality of the nervous system
-190000769,cuimc,ohdsi,Abnormality of the breast
-190000818,cuimc,ohdsi,Abnormality of the endocrine system
-190001197,cuimc,ohdsi,Abnormality of prenatal development or birth
-190001507,cuimc,ohdsi,Growth abnormality
-190001574,cuimc,ohdsi,Abnormality of the integument
-190001608,cuimc,ohdsi,Abnormality of the voice
-190001626,cuimc,ohdsi,Abnormality of the cardiovascular system
-190001871,cuimc,ohdsi,Abnormality of blood and blood-forming tissues
-190001939,cuimc,ohdsi,Abnormality of metabolism/homeostasis
-190002086,cuimc,ohdsi,Abnormality of the respiratory system
-190002664,cuimc,ohdsi,Neoplasm
-190002715,cuimc,ohdsi,Abnormality of the immune system
-190025031,cuimc,ohdsi,Abnormality of the digestive system
-190025142,cuimc,ohdsi,Constitutional symptom
-190025354,cuimc,ohdsi,Abnormal cellular phenotype
-190033127,cuimc,ohdsi,Abnormality of the musculoskeletal system
-190040064,cuimc,ohdsi,Abnormality of limbs
-190045027,cuimc,ohdsi,Abnormality of the thoracic cavity
-290000119,cuimc,notes,Abnormality of the genitourinary system
-290000152,cuimc,notes,Abnormality of head or neck
-290000478,cuimc,notes,Abnormality of the eye
-290000598,cuimc,notes,Abnormality of the ear
-290000707,cuimc,notes,Abnormality of the nervous system
-290000769,cuimc,notes,Abnormality of the breast
-290000818,cuimc,notes,Abnormality of the endocrine system
-290001197,cuimc,notes,Abnormality of prenatal development or birth
-290001507,cuimc,notes,Growth abnormality
-290001574,cuimc,notes,Abnormality of the integument
-290001608,cuimc,notes,Abnormality of the voice
-290001626,cuimc,notes,Abnormality of the cardiovascular system
-290001871,cuimc,notes,Abnormality of blood and blood-forming tissues
-290001939,cuimc,notes,Abnormality of metabolism/homeostasis
-290002086,cuimc,notes,Abnormality of the respiratory system
-290002664,cuimc,notes,Neoplasm
-290002715,cuimc,notes,Abnormality of the immune system
-290025031,cuimc,notes,Abnormality of the digestive system
-290025142,cuimc,notes,Constitutional symptom
-290025354,cuimc,notes,Abnormal cellular phenotype
-290033127,cuimc,notes,Abnormality of the musculoskeletal system
-290040064,cuimc,notes,Abnormality of limbs
-290045027,cuimc,notes,Abnormality of the thoracic cavity
+﻿dataset_id,clinical_site,source,subpopulation,subclass_category
+1,cuimc,ohdsi,all,all
+2,cuimc,notes,all,all
+3,chop,notes,all,all
+10,cuimc,ohdsi,age,neonates (0-2)
+11,cuimc,ohdsi,age,kid (3-11)
+12,cuimc,ohdsi,age,teenage (2-17)
+13,cuimc,ohdsi,age,adult (18-99)
+20,cuimc,notes,age,neonates (0-2)
+21,cuimc,notes,age,kid (3-11)
+22,cuimc,notes,age,teenage (2-17)
+23,cuimc,notes,age,adult (18-99)
+100,cuimc,ohdsi,specialist,genetic
+199,cuimc,ohdsi,all,hierachical
+200,cuimc,notes,specialist,genetic
+299,cuimc,notes,all,hierachical
+190000119,cuimc,ohdsi,specialist,Abnormality of the genitourinary system
+190000152,cuimc,ohdsi,specialist,Abnormality of head or neck
+190000478,cuimc,ohdsi,specialist,Abnormality of the eye
+190000598,cuimc,ohdsi,specialist,Abnormality of the ear
+190000707,cuimc,ohdsi,specialist,Abnormality of the nervous system
+190000769,cuimc,ohdsi,specialist,Abnormality of the breast
+190000818,cuimc,ohdsi,specialist,Abnormality of the endocrine system
+190001197,cuimc,ohdsi,specialist,Abnormality of prenatal development or birth
+190001507,cuimc,ohdsi,specialist,Growth abnormality
+190001574,cuimc,ohdsi,specialist,Abnormality of the integument
+190001608,cuimc,ohdsi,specialist,Abnormality of the voice
+190001626,cuimc,ohdsi,specialist,Abnormality of the cardiovascular system
+190001871,cuimc,ohdsi,specialist,Abnormality of blood and blood-forming tissues
+190001939,cuimc,ohdsi,specialist,Abnormality of metabolism/homeostasis
+190002086,cuimc,ohdsi,specialist,Abnormality of the respiratory system
+190002664,cuimc,ohdsi,specialist,Neoplasm
+190002715,cuimc,ohdsi,specialist,Abnormality of the immune system
+190025031,cuimc,ohdsi,specialist,Abnormality of the digestive system
+190025142,cuimc,ohdsi,specialist,Constitutional symptom
+190025354,cuimc,ohdsi,specialist,Abnormal cellular phenotype
+190033127,cuimc,ohdsi,specialist,Abnormality of the musculoskeletal system
+190040064,cuimc,ohdsi,specialist,Abnormality of limbs
+190045027,cuimc,ohdsi,specialist,Abnormality of the thoracic cavity
+290000119,cuimc,notes,specialist,Abnormality of the genitourinary system
+290000152,cuimc,notes,specialist,Abnormality of head or neck
+290000478,cuimc,notes,specialist,Abnormality of the eye
+290000598,cuimc,notes,specialist,Abnormality of the ear
+290000707,cuimc,notes,specialist,Abnormality of the nervous system
+290000769,cuimc,notes,specialist,Abnormality of the breast
+290000818,cuimc,notes,specialist,Abnormality of the endocrine system
+290001197,cuimc,notes,specialist,Abnormality of prenatal development or birth
+290001507,cuimc,notes,specialist,Growth abnormality
+290001574,cuimc,notes,specialist,Abnormality of the integument
+290001608,cuimc,notes,specialist,Abnormality of the voice
+290001626,cuimc,notes,specialist,Abnormality of the cardiovascular system
+290001871,cuimc,notes,specialist,Abnormality of blood and blood-forming tissues
+290001939,cuimc,notes,specialist,Abnormality of metabolism/homeostasis
+290002086,cuimc,notes,specialist,Abnormality of the respiratory system
+290002664,cuimc,notes,specialist,Neoplasm
+290002715,cuimc,notes,specialist,Abnormality of the immune system
+290025031,cuimc,notes,specialist,Abnormality of the digestive system
+290025142,cuimc,notes,specialist,Constitutional symptom
+290025354,cuimc,notes,specialist,Abnormal cellular phenotype
+290033127,cuimc,notes,specialist,Abnormality of the musculoskeletal system
+290040064,cuimc,notes,specialist,Abnormality of limbs
+290045027,cuimc,notes,specialist,Abnormality of the thoracic cavity
