@@ -49,39 +49,136 @@ mondoCount %>% pull(concept_code) %>% unique() %>% length() # 2531
 
 hitCountDf = MondoIdForEvalDf %>% left_join(mondoCount) %>% left_join(patientCount)
 hitCountDf = hitCountDf %>% replace(is.na(.), 0) %>% as.data.table() 
-hitCountDf = hitCountDf %>% 
+
+########################################
+# figure 3a
+########################################
+overallHitCountDf = hitCountDf %>% 
   mutate(prev = concept_count/count) %>% 
-  mutate(prev_bin = cut(prev,breaks = c(0,5e-6,5e-5,5e-4,5e-3,5e-2,5e-1,1),include.lowest = T)) %>%
+  mutate(prev_bin = cut(prev,breaks = c(0,5e-6,5e-5,5e-4,1),include.lowest = T)) %>%
   group_by(dataset_id,prev_bin) %>% summarise(count_of_concepts = n_distinct(concept_code)) 
 
-fig3a = hitCountDf %>% 
-  ggplot(aes(fill=as.factor(dataset_id), y=count_of_concepts, x=prev_bin)) +
+fig3a = overallHitCountDf %>% 
+  ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(dataset_id))) +
   geom_bar(position="dodge", stat="identity") + 
-  xlab("Prevelence in the dataset") +
+  xlab("Dataset") +
   ylab("Number of rare diseases") + 
-  scale_fill_discrete(name="Dataset",
+  scale_x_discrete(name="Dataset",
                       breaks=c("1", "2", "3"),
                       labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes"))+ 
+  scale_fill_discrete(name="EHR Prevalence",
+                   breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
+                   labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
+  coord_flip() +
   labs(title = "(A)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(legend.position="top") 
+
+########################################
+# figure 3b
+########################################
+prev = fread("./orpha_prev.csv")
+mondoXref = fread("./mondo_xref.csv")
+colnames(mondoXref) = c("MONDO_ID","class_id")
+colnames(hitCountDf)[1] = c("MONDO_ID")
+prevHitCount = hitCountDf %>% inner_join(mondoXref) %>% inner_join(prev) %>%
+  mutate(prev = concept_count/count) %>% 
+  mutate(prev_bin = cut(prev,breaks = c(0,5e-6,5e-5,5e-4,1),include.lowest = T)) %>%
+  group_by(dataset_id,prev_bin,annotation_class) %>% 
+  summarise(count_of_concepts = n_distinct(MONDO_ID)) %>% as_tibble() %>%
+  mutate(dataset_id = as.factor(dataset_id))
+levels(prevHitCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
+levels(prevHitCount$dataset_id) = c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")
+prevHitCount = prevHitCount %>% mutate(annotation_class = replace(annotation_class, annotation_class == "6-9 / 10 000", "1-9 / 10 000"))
+prevHitCount = prevHitCount %>% mutate(annotation_class = replace(annotation_class, annotation_class == "1-5 / 10 000", "1-9 / 10 000"))
+prevHitCount = prevHitCount %>% filter(!annotation_class %in% c("Unknown_epidemiological_range",">1 / 1000"))
+prevHitCount = prevHitCount %>% mutate(annotation_class = as.factor(annotation_class))
+prevHitCount$annotation_class = factor(prevHitCount$annotation_class, levels = 
+                                         c("<1 / 1 000 000", "1-9 / 1 000 000","1-9 / 100 000","1-9 / 10 000"))
+
+fig3b = prevHitCount %>% 
+  ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
+  geom_bar(position="fill", stat="identity") + 
+  xlab("Point prevalence range in OAPHANET ") +
+  ylab("Number of rare diseases") + 
+  coord_flip() + facet_wrap(~dataset_id) +
+  scale_fill_discrete(name="EHR Prevalence",
+                      breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
+                      labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
+  labs(title = "(C)") +
   theme(plot.title = element_text(hjust = 0.5))
 
-# read phenotype.hpoa
-# return tables 1
-# disease_id, hp_id, freq, onset, evidence
+########################################
+# figure 3c
+########################################
+inheritance = fread("./orpha_inheritance.csv")
+mondoXref = fread("./mondo_xref.csv")
+colnames(mondoXref) = c("MONDO_ID","class_id")
+colnames(hitCountDf)[1] = c("MONDO_ID")
+inherHitCount = hitCountDf %>% inner_join(mondoXref) %>% inner_join(inheritance) %>%
+  mutate(prev = concept_count/count) %>% 
+  mutate(prev_bin = cut(prev,breaks = c(0,5e-6,5e-5,5e-4,1),include.lowest = T)) %>%
+  group_by(dataset_id,prev_bin,annotation_class) %>% 
+  summarise(count_of_concepts = n_distinct(MONDO_ID)) %>% as_tibble() %>%
+  mutate(dataset_id = as.factor(dataset_id)) %>%
+  mutate(annotation_class = as.factor(annotation_class))
+levels(inherHitCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
+levels(inherHitCount$dataset_id) = c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")
+levels(inherHitCount$annotation_class)
+inherHitCount = inherHitCount %>% filter(!annotation_class %in% c("Y-linked","oligogenic","semi-dominant","no inheritance data available","unknown inheritance"))
+# 
+# inherHitCount$annotation_class = factor(inherHitCount$annotation_class, levels = c(
+#   "antenatal","neonatal","infancy","childhood","adolescent","adult","elderly","all ages","no age of onset data available"
+# ))
+# levels(onsetHitCount$annotation_class)[9] = "no available"
 
-# read MONDO owl
-# return tables 2
-# mondo_id, disease_id, inheri_mode,
+fig3c = inherHitCount %>% 
+  ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
+  geom_bar(position="fill", stat="identity") + 
+  xlab("Inheritance mode in OAPHANET ") +
+  ylab("Number of rare diseases") + 
+  coord_flip() + facet_wrap(~dataset_id) +
+  scale_fill_discrete(name="EHR Prevalence",
+                      breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
+                      labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
+  labs(title = "(C)") +
+  theme(plot.title = element_text(hjust = 0.5))
 
-# use ebi api
-# example: https://www.ebi.ac.uk/ols/api/ontologies/ordo/terms?iri=http://www.orpha.net/ORDO/Orphanet_2137
-# use has_point_prevalence_average_value
-# example: "has_point_prevalence_average_value" : [ "42.9", "11.0", "4.0", "16.9", "23.9", "24.5", "10.7", "11.6", "23.5" ],
-# use age onset
-# example: "has_age_of_onset" : [ "http://www.orpha.net/ORDO/Orphanet_409949", "http://www.orpha.net/ORDO/Orphanet_409948", "http://www.orpha.net/ORDO/Orphanet_409947", "http://www.orpha.net/ORDO/Orphanet_409946" ],
-# create a table 3
-# obo_id, age, onset, 
+########################################
+# figure 3d
+########################################
+onset = fread("./orpha_onset.csv")
+mondoXref = fread("./mondo_xref.csv")
+colnames(mondoXref) = c("MONDO_ID","class_id")
+colnames(hitCountDf)[1] = c("MONDO_ID")
+onsetHitCount = hitCountDf %>% inner_join(mondoXref) %>% inner_join(onset) %>%
+  mutate(prev = concept_count/count) %>% 
+  mutate(prev_bin = cut(prev,breaks = c(0,5e-6,5e-5,5e-4,1),include.lowest = T)) %>%
+  group_by(dataset_id,prev_bin,annotation_class) %>% 
+  summarise(count_of_concepts = n_distinct(MONDO_ID)) %>% as_tibble() %>%
+  mutate(dataset_id = as.factor(dataset_id)) %>%
+  mutate(annotation_class = as.factor(annotation_class))
+levels(onsetHitCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
+levels(onsetHitCount$dataset_id) = c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")
+onsetHitCount$annotation_class = factor(onsetHitCount$annotation_class, levels = c(
+  "antenatal","neonatal","infancy","childhood","adolescent","adult","elderly","all ages","no age of onset data available"
+))
+levels(onsetHitCount$annotation_class)[9] = "no available"
 
-# hitCountDf join table 1, 2, 3
+fig3d = onsetHitCount %>% 
+  ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
+  geom_bar(position="fill", stat="identity") + 
+  xlab("Onset age in OAPHANET ") +
+  ylab("Number of rare diseases") + 
+  coord_flip() + facet_wrap(~dataset_id) +
+  scale_fill_discrete(name="EHR Prevalence",
+                      breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
+                      labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
+  labs(title = "(D)") +
+  theme(plot.title = element_text(hjust = 0.5))
 
-
+require(gridExtra)
+lay <- rbind(c(1,1,2,2),
+             c(3,3,4,4))
+# grid.arrange(fig2a, fig2b, fig2c, fig2d, ncol = 2)
+grid.arrange(fig3a, fig3b, fig3c, fig3d,layout_matrix = lay)

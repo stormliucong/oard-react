@@ -86,8 +86,8 @@ fig2a = hitCountDf %>%
   mutate(number_of_pts = recode_factor(hpo_count_bin, "(-Inf,9]" = "< 10", "(9, Inf]" = ">= 10")) %>%
   ggplot(aes(fill=dataset, y=count_of_hpos, x=number_of_pts)) +
   geom_bar(position="dodge", stat="identity") + 
-  xlab("number of patients in the dataset") +
-  ylab("number of HPO concepts") + 
+  xlab("Number of patients in the dataset") +
+  ylab("Number of HPO concepts") + 
   scale_fill_discrete(name="Dataset",
                       breaks=c("1", "2", "3"),
                       labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes"))+ 
@@ -144,7 +144,7 @@ fig2c = rootHitCountDf %>%
   ggplot(aes(y=ratio,x=as.numeric(dist_to_root), group = as.factor(dataset_id))) + 
   geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
-  xlab("") +
+  xlab("Distance to root") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
@@ -182,7 +182,7 @@ fig2d = tokenHitCountDf %>%
   ggplot(aes(y=ratio,x=as.numeric(min_token_count), group = as.factor(dataset_id))) + 
   geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
-  xlab("") +
+  xlab("Number of tokens") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
@@ -223,7 +223,7 @@ fig2e = stringHitCountDf %>%
   ggplot(aes(y=ratio,x=as.factor(min_avg_string_length_bin), group = as.factor(dataset_id))) + 
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
   geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
-  xlab("") +
+  xlab("String length") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
@@ -261,7 +261,7 @@ fig2f = posHitCountDf %>%
   ggplot(aes(y=ratio,x=as.factor(pos_tag), group = as.factor(dataset_id))) + 
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
   geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
-  xlab("") +
+  xlab("POS") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
@@ -299,7 +299,7 @@ fig2g = patternHitCountDf %>%
   ggplot(aes(y=ratio,x=as.factor(ontology), group = as.factor(dataset_id))) + 
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
   geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
-  xlab("") +
+  xlab("Design ontology") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
