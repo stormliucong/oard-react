@@ -182,3 +182,65 @@ lay <- rbind(c(1,1,2,2),
              c(3,3,4,4))
 # grid.arrange(fig2a, fig2b, fig2c, fig2d, ncol = 2)
 grid.arrange(fig3a, fig3b, fig3c, fig3d,layout_matrix = lay)
+
+
+########################################
+# efigure 1
+########################################
+
+# extract hit count.
+res <- dbSendQuery(con, "
+                   SELECT cc.dataset_id as dataset_id, c.concept_code as concept_code, 
+                   cc.concept_count as concept_count FROM concept_counts cc 
+                   INNER JOIN concept c ON c.concept_id = cc.concept_id
+                   WHERE c.domain_id = 'diseases' and cc.concept_count >=10 and cc.dataset_id in ('20','21','22','23') 
+                   GROUP BY c.concept_code, cc.dataset_id;
+                   ")
+mondoAgeCount = dbFetch(res) %>% as_tibble()
+dbClearResult(res)
+
+# extract patient count
+res = dbSendQuery(con, "SELECT * FROM patient_count WHERE dataset_id in ('20','21','22','23') ")
+patientAgeCount = dbFetch(res) %>% as_tibble()
+dbClearResult(res)
+
+MondoIdForAgeEvalDf = union(
+  union_all(
+    union_all(
+      mondoNameDf %>% select(concept_code) %>% mutate(dataset_id = 20),
+      mondoNameDf %>% select(concept_code) %>% mutate(dataset_id = 21)
+      ),  mondoNameDf %>% select(concept_code) %>% mutate(dataset_id = 22)
+    ),mondoNameDf %>% select(concept_code) %>% mutate(dataset_id = 23)
+)
+
+
+hitAgeCountDf = MondoIdForAgeEvalDf %>% left_join(mondoAgeCount) %>% left_join(patientAgeCount)
+hitAgeCountDf = hitAgeCountDf %>% replace(is.na(.), 0) %>% as.data.table() 
+colnames(hitAgeCountDf)[1] = 'MONDO_ID'
+
+onsetHitOnsetCount = hitAgeCountDf %>% inner_join(mondoXref) %>% inner_join(onset) %>%
+  mutate(prev = concept_count/count) %>% 
+  mutate(prev_bin = cut(prev,breaks = c(0,5e-6,5e-5,5e-4,1),include.lowest = T)) %>%
+  group_by(dataset_id,prev_bin,annotation_class) %>% 
+  summarise(count_of_concepts = n_distinct(MONDO_ID)) %>% as_tibble() %>%
+  mutate(dataset_id = as.factor(dataset_id)) %>%
+  mutate(annotation_class = as.factor(annotation_class))
+levels(onsetHitOnsetCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
+levels(onsetHitOnsetCount$dataset_id) = c("neonatal", "young kid", "teenage","adult")
+onsetHitOnsetCount$annotation_class = factor(onsetHitOnsetCount$annotation_class, levels = c(
+  "antenatal","neonatal","infancy","childhood","adolescent","adult","elderly","all ages","no age of onset data available"
+))
+levels(onsetHitOnsetCount$annotation_class)[9] = "no available"
+
+efig1 = onsetHitOnsetCount %>% 
+  ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
+  geom_bar(position="fill", stat="identity") + 
+  xlab("Onset age in OAPHANET ") +
+  ylab("Number of rare diseases") + 
+  coord_flip() + facet_wrap(~dataset_id) +
+  scale_fill_discrete(name="EHR Prevalence",
+                      breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
+                      labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
+  labs(title = "eFigure 1") +
+  theme(plot.title = element_text(hjust = 0.5))
+
