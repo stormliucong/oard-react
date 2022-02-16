@@ -56,6 +56,9 @@ hpo_code = hpo_code[,.(HPO_ID,concept_id)]
 concept_pair_anno = merge(concept_pair_anno,hpo_code,by = "HPO_ID")
 colnames(concept_pair_anno)[dim(concept_pair_anno)[2]] = 'concept_id_2'
 
+####################################
+# generate annotated dist
+####################################
 concept_pair_full_stat = merge(concept_pair_anno[,.(.N),by=.(concept_id_1,concept_id_2)],concept_pair_stat,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
 concept_pair_anno_dist = concept_pair_full_stat[!is.na(N)]
 concept_pair_anno_dist[,distribution := "annotated"]
@@ -205,5 +208,28 @@ wilcox.test(x, y, paired = TRUE, alternative = "greater")
 
 
 
+##################
+# derive confident level
+##################
+library(matrixStats)
+# get backgroud
+concept_pair_count_lg_10 = concept_pair_anno_dist[,.(.N),by=concept_id_2][N >= 10]
+concept_pair_count_lg_10_anno_dist = merge(concept_pair_count_lg_10[,.(concept_id_2)], concept_pair_anno_dist,all.y = F,all.x = T, by = "concept_id_2")
+concept_pair_count_lg_10_anno_dist = melt(concept_pair_count_lg_10_anno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
+concept_pair_count_lg_10_anno_levels = concept_pair_count_lg_10_anno_dist[,as.list(quantile(association, probs = seq(0.5, 0.9, 0.1))),by=.(concept_id_2,stat)]
+concept_pair_count_lg_10_anno_levels = melt(concept_pair_count_lg_10_anno_levels,measure.vars = c("50%","60%","70%","80%","90%"),variable.name = "confidence",value.name = "association_threshold")
+concept_pair_count_sm_10 = concept_pair_anno_dist[,.(.N),by=concept_id_2][N < 10]
+concept_pair_count_sm_10_anno_dist = merge(concept_pair_count_sm_10[,.(concept_id_2)], concept_pair_anno_dist,all.y = F,all.x = T, by = "concept_id_2")
+concept_pair_count_sm_10_anno_dist = melt(concept_pair_count_sm_10_anno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
+concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_dist[,as.list(quantile(association, probs = seq(0.5, 0.9, 0.1))),by=.(concept_id_2,stat)]
+concept_pair_count_sm_10_anno_levels = melt(concept_pair_count_sm_10_anno_levels,measure.vars = c("50%","60%","70%","80%","90%"),variable.name = "confidence",value.name = "association_threshold")
+concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_levels[,.(association_threshold = median(association_threshold)),by=.(stat,confidence)]
 
-
+concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N)]
+concept_pair_nonanno_dist = melt(concept_pair_nonanno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
+concept_pair_count_lg_10_merge = merge(concept_pair_nonanno_dist,concept_pair_count_lg_10_anno_levels,by = c("concept_id_2","stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
+concept_pair_count_sm_10_merge = merge(concept_pair_nonanno_dist[!concept_id_2 %in% unique(concept_pair_count_lg_10_anno_levels$concept_id_2)],concept_pair_count_sm_10_anno_levels,by = c("stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
+concept_pair_count_merge = rbind(concept_pair_count_lg_10_merge,concept_pair_count_sm_10_merge)
+concept_pair_count_confidence = concept_pair_count_merge[,.(confidence_count = sum(association > association_threshold )),by=.(confidence,concept_id_2,concept_id_1)]
+concept_pair_count_confidence = concept_pair_count_confidence[,.(count = .N),by=.(confidence,confidence_count)]
+confidence_nonannootated_dt = dcast(concept_pair_count_confidence, confidence ~ confidence_count, value.var = c("count"))
