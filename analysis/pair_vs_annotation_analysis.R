@@ -1,5 +1,5 @@
 # Author: Cong Liu
-# Last updated: 02-14-2022
+# Last updated: 02-15-2022
 
 rm(list=ls())
 library(data.table)
@@ -169,7 +169,8 @@ grid.arrange(fig4a, fig4b, fig4c,fig4d,layout_matrix = lay)
 
 
 
-
+###
+raw_concept_pair = fread("../../material/concept_pair/concept_pair.csv")
 
 
 
