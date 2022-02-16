@@ -19,10 +19,14 @@ concept_pair = merge(concept_pair,concept_count,by = c("dataset_id","concept_id_
 colnames(concept_count)[2:3] = c("concept_id_2","concept_count_2")
 concept_pair = merge(concept_pair,concept_count,by = c("dataset_id","concept_id_2"))
 concept_pair = merge(concept_pair,patient_count,by = c("dataset_id"))
-concept_pair[, e1 := (as.numeric(concept_count_1) * concept_count_2)/count]
-concept_pair[, e2 := count - as.numeric(concept_count_1)* concept_count_2/count]
-concept_pair[, e3 := as.numeric(concept_count_2) * (count - concept_count_2)/count]
-concept_pair[, e4 := (as.numeric(count) - concept_count_2) * (count - concept_count_2)/count]
+concept_pair[,concept_count_1 := as.numeric(concept_count_1)]
+concept_pair[,concept_count_2 := as.numeric(concept_count_2)]
+concept_pair[,concept_pair_count := as.numeric(concept_pair_count)]
+concept_pair[,count := as.numeric(count)]
+concept_pair[, e1 := concept_count_1 * concept_count_2/count]
+concept_pair[, e2 := (count - concept_count_2) * concept_count_1 /count]
+concept_pair[, e3 := (count - concept_count_1) * concept_count_2 /count]
+concept_pair[, e4 := (count - concept_count_1) * (count - concept_count_2) /count]
 concept_pair[, o1 := concept_pair_count]
 concept_pair[, o2 := concept_count_1 - concept_pair_count]
 concept_pair[, o3 := concept_count_2 - concept_pair_count]
@@ -30,7 +34,9 @@ concept_pair[, o4 := count - concept_count_1 - concept_count_2 + concept_pair_co
 concept_pair[, chisquare := (o1-e1)^2/e1 + (o2-e2)^2/e2 + (o3-e3)^2/e3 + (o4-e4)^2/e4]
 concept_pair[, odds_ratio := log(concept_pair_count/e1)]
 concept_pair[, jaccard_index := concept_pair_count /(concept_count_1 + concept_count_2 - concept_pair_count)]
-
+# about 5 mins
 save(concept_pair, file = "./concept_pair.rda")
 
+concept_pair = get(load(file = "./concept_pair.rda"))
 
+concept_pair %>% sample_n(10)
