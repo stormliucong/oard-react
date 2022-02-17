@@ -83,7 +83,7 @@ concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_dist[,as.li
 concept_pair_count_sm_10_anno_levels = melt(concept_pair_count_sm_10_anno_levels,measure.vars = c("50%","60%","70%","80%","90%"),variable.name = "confidence",value.name = "association_threshold")
 concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_levels[,.(association_threshold = median(association_threshold)),by=.(stat,confidence)]
 
-concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N)]
+concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_1 < 90000000]
 concept_pair_nonanno_dist = melt(concept_pair_nonanno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
 concept_pair_count_lg_10_merge = merge(concept_pair_nonanno_dist,concept_pair_count_lg_10_anno_levels,by = c("concept_id_2","stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
 concept_pair_count_sm_10_merge = merge(concept_pair_nonanno_dist[!concept_id_2 %in% unique(concept_pair_count_lg_10_anno_levels$concept_id_2)],concept_pair_count_sm_10_anno_levels,by = c("stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
@@ -91,3 +91,6 @@ concept_pair_count_merge = rbind(concept_pair_count_lg_10_merge,concept_pair_cou
 concept_pair_count_merge = concept_pair_count_merge[,.(confidence_count = sum(association > association_threshold )),by=.(confidence,concept_id_2,concept_id_1)]
 concept_pair_count_confidence = concept_pair_count_merge[,.(count = .N),by=.(confidence,confidence_count)]
 confidence_nonannootated_dt = dcast(concept_pair_count_confidence, confidence ~ confidence_count, value.var = c("count"))
+
+
+concept_pair_count_merge 
