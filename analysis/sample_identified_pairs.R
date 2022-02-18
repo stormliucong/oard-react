@@ -83,7 +83,7 @@ concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_dist[,as.li
 concept_pair_count_sm_10_anno_levels = melt(concept_pair_count_sm_10_anno_levels,measure.vars = c("50%","60%","70%","80%","90%"),variable.name = "confidence",value.name = "association_threshold")
 concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_levels[,.(association_threshold = median(association_threshold)),by=.(stat,confidence)]
 
-concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_1 < 90000000]
+concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_1 %in% unique(concept_pair_anno_dist$concept_id_1) & concept_id_2 > 90000000]
 concept_pair_nonanno_dist = melt(concept_pair_nonanno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
 concept_pair_count_lg_10_merge = merge(concept_pair_nonanno_dist,concept_pair_count_lg_10_anno_levels,by = c("concept_id_2","stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
 concept_pair_count_sm_10_merge = merge(concept_pair_nonanno_dist[!concept_id_2 %in% unique(concept_pair_count_lg_10_anno_levels$concept_id_2)],concept_pair_count_sm_10_anno_levels,by = c("stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
@@ -93,4 +93,20 @@ concept_pair_count_confidence = concept_pair_count_merge[,.(count = .N),by=.(con
 confidence_nonannootated_dt = dcast(concept_pair_count_confidence, confidence ~ confidence_count, value.var = c("count"))
 
 
-concept_pair_count_merge 
+set.seed(1)
+concept_pair_count_merge_sample = concept_pair_count_merge[confidence_count > 0,.SD[sample(.N, min(10,.N))],by = .(confidence_count,confidence)]
+con <- dbConnect(RMariaDB::MariaDB(), group = "ncats")
+res <- dbSendQuery(con, "
+SELECT 
+c.concept_name,
+c.concept_id
+FROM concept c
+")
+concept_name = dbFetch(res) %>% as.data.table()
+dbClearResult(res)
+colnames(concept_name) = c("concept_name_1","concept_id_1")
+concept_pair_count_merge_sample = merge(concept_pair_count_merge_sample,concept_name,all.y = F,by='concept_id_1')
+colnames(concept_name) = c("concept_name_2","concept_id_2")
+concept_pair_count_merge_sample = merge(concept_pair_count_merge_sample,concept_name,all.y = F,by='concept_id_2')
+
+concept_pair_count_merge_sample %>% fwrite(file = "./novel_identified_DPA_sample_200_seed_1.csv")
