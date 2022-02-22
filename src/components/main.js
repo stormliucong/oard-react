@@ -146,41 +146,73 @@ class MainComp extends Component {
     }
 
 
-    loadConceptsEbi = async () => {
-        const query = this.state.queryText
+    loadConceptsEbi = async (q) => {
+        const query = q
         console.log(query)
         var response = await axios.get('https://www.ebi.ac.uk/ols/api/select', {
             params: {
                 q: query,
-                ontology: 'mondo,hp',
-                rows: 50
+                rows: 50,
+                ontology: 'hp,omim,mondo,ordo'
             }
         });
-        this.setState({ querySugList: [] })
+        // this.setState({ querySugList: [] })
         var resultList = response.data.response.docs
+        console.log(resultList)
+        var terms = []
+        var idCheck = {}
         if (resultList.length > 0) {
             resultList.forEach((doc) => {
-                var term = {}
-                if (doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:')) {
-
-                    term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE' : 'HPO Phenotype'
-                    term.label = doc.label
-                    term.id = doc.obo_id
-                    const idExist = this.state.querySugList.find(element => {
-                        if (element.id === term.id) {
-                            return true;
+                // console.log(doc)
+                if(doc.obo_id  !== undefined){
+                    if (doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:') || doc.obo_id.startsWith('Orphanet:') || doc.obo_id.startsWith('OMIM:')) {
+                        
+                        // term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE' : 'HPO Phenotype'
+                        var label = doc.label
+                        var id = doc.obo_id
+                        if(idCheck[id] === undefined){
+                            idCheck[id] = 1
+                            terms.push({"id": id, "name": label})
                         }
-                    });
-                    if (idExist === undefined) {
-                        this.setState({ querySugList: [...this.state.querySugList, term] })
                     }
                 }
+                
             });
         }
+        // var list = this.processResponseEbi(response)
+        console.log(terms)
+        this.setState({ querySugList: terms })
+        console.log(this.state.querySugList)
+
     }
 
     processResponse = (response) => {
         return response.data.terms
+    }
+
+    processResponseEbi = (response) => {
+        var resultList = response.data.response.docs
+        var terms = []
+        var idCheck = {}
+        if (resultList.length > 0) {
+            resultList.forEach((doc) => {
+                // console.log(doc)
+                if(doc.obo_id  !== undefined){
+                    if (doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:')) {
+                        
+                        // term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE' : 'HPO Phenotype'
+                        var label = doc.label
+                        var id = doc.obo_id
+                        if(idCheck[id] === undefined){
+                            idCheck[id] = 1
+                            terms.push({"id": id, "name": label})
+                        }
+                    }
+                }
+                
+            });
+        }
+        return terms
     }
 
     handleDatasetSelectChange = (ds) => {
@@ -315,7 +347,7 @@ class MainComp extends Component {
             <Grid container xs={12} spacing={2} justifyContent="center" p={10}>
 
                 {/* form */}
-                <Grid item xs={12} spacing={5} container justifyContent="space-around">
+                <Grid container item xs={12} spacing={5}  justifyContent="space-around">
                     {/* search box 1 */}
                     <Grid item xs={12} lg={6} >
                         <Autocomplete
@@ -323,16 +355,15 @@ class MainComp extends Component {
                             disablePortal
                             multiple
                             id="combo-box-demo"
-                            getOptionLabel={(option) => option.name}
+                            getOptionLabel={(option) => option.name + " [" + option.id + "]"}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
                             options={this.state.querySugList}
                             filterOptions={(x) => x}
                             //user input in the box
                             onInputChange={(event, newInputValue) => {
-                                console.log(newInputValue)
                                 this.setState({ queryText: newInputValue })
                                 if (newInputValue.length > 2) {
-                                    this.loadConcepts()
-                                    console.log(this.state.querySugList)
+                                    this.loadConceptsEbi(newInputValue)
                                 }
                             }}
                             // user select from suggestion list
@@ -376,16 +407,14 @@ class MainComp extends Component {
                             disablePortal
                             multiple
                             id="combo-box-demo"
-                            getOptionLabel={(option) => option.name}
+                            getOptionLabel={(option) => option.name + " [" + option.id + "]"}
                             options={this.state.querySugList}
                             filterOptions={(x) => x}
                             //user input in the box
                             onInputChange={(event, newInputValue) => {
-                                console.log(newInputValue)
                                 this.setState({ queryText: newInputValue })
                                 if (newInputValue.length > 2) {
-                                    this.loadConcepts()
-                                    console.log(this.state.querySugList)
+                                    this.loadConceptsEbi(newInputValue)
                                 }
                             }}
                             // user select from suggestion list
@@ -399,7 +428,7 @@ class MainComp extends Component {
                                     <Box sx={{
                                         border: 0,
                                         fontSize: 'smaller'
-                                    }}> {option.name} </Box>
+                                    }}> {option.name}</Box>
                                     <Box sx={{
                                         border: 0,
                                         fontWeight: 'light',
@@ -493,7 +522,7 @@ class MainComp extends Component {
                     </Grid>
 
                     {/* submit button */}
-                    <Grid item xs={12} md={6} lg={2} container justifyContent="center">
+                    <Grid item container xs={12} md={6} lg={2} justifyContent="center">
                         <FormControl error={this.state.submitError} sx={{ display: 'flex' }}>
                             <Button variant="contained" onClick={this.handleSubmit} size="large">Submit</Button>
                             <FormHelperText>{this.state.submitHelperText}</FormHelperText>
@@ -502,7 +531,7 @@ class MainComp extends Component {
                 </Grid>
 
                 {/* results */}
-                <Grid item xs={12} container justifyContent="space-around">
+                <Grid item container xs={12}  justifyContent="space-around">
                     <List aria-label="mailbox folders" sx={{ display: 'flex',flexDirection:"column",alignItems:"stretch"}}>
                         {this.state.apiResultsDisplay &&
                             <ListSubheader>

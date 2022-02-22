@@ -8,11 +8,9 @@ import { Grid } from '@mui/material';
 function App() {
   return (
     <React.Fragment>
-      <Grid container spacing={2} direction="column" justifyContent="center">
         <AppBarComp />
         <CardComp />
         <MainComp />
-      </Grid>
     </React.Fragment>
   );
 }
