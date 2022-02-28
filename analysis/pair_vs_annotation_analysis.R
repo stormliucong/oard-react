@@ -57,12 +57,13 @@ res <- dbSendQuery(con, "
 singleCount = dbFetch(res) %>% as.data.table()
 dbClearResult(res)
 pairCount = pairCount %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
-pair_dt1 = pairCount %>% filter(dataset_id == 1)
 pair_dt2 = pairCount %>% filter(dataset_id == 2)
+pair_dt3 = pairCount %>% filter(dataset_id == 3)
 
 vennListA = list(
   `HPO annotation` = pair_anno$pair_name,
-  `CUIMC/Notes` = pair_dt2$pair_name
+  `CUIMC/Notes` = pair_dt2$pair_name,
+  `CHOP/Notes` = pair_dt3$pair_name
 )
 
 fig4a = ggvenn(vennListA,
@@ -98,7 +99,8 @@ pairRawCount = raw_concept_pair_2 %>%
 pairRawCount = pairRawCount %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
 vennListB = list(
   `HPO annotation` = pair_anno$pair_name,
-  `CUIMC/Notes` = pairRawCount$pair_name
+  `CUIMC/Notes` = pairRawCount$pair_name,
+  `CHOP/Notes` = pair_dt3$pair_name
 )
 fig4b = ggvenn(vennListB,
                fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#CD534CFF"),
@@ -134,7 +136,7 @@ pairRawHierCount = raw_concept_pair_299 %>%
 pairRawHierCount = pairRawHierCount %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
 vennListC = list(
   `HPO annotation` = pair_anno$pair_name,
-  `CUIMC/Notes` = pairRawHierCount$pair_name
+  `CUIMC/Notes` = pairRawHierCount$pair_name,
 )
 fig4c = ggvenn(vennListC,
                fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#CD534CFF"),
@@ -150,7 +152,8 @@ pair_anno_mondo_const = pair_anno %>% inner_join(singleCount %>% select("concept
 
 vennListD = list(
   `HPO annotation` = intersect(pair_anno_hpo_const$pair_name,pair_anno_mondo_const$pair_name),
-  `CUIMC/Notes` = pairRawHierCount$pair_name
+  `CUIMC/Notes` = pairRawHierCount$pair_name,
+  `CHOP/Notes` = pair_dt3$pair_name
 )
 fig4d = ggvenn(vennListD,
             fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#CD534CFF"),
