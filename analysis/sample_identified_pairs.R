@@ -93,6 +93,7 @@ concept_pair_count_confidence = concept_pair_count_merge[,.(count = .N),by=.(con
 confidence_nonannootated_dt = dcast(concept_pair_count_confidence, confidence ~ confidence_count, value.var = c("count"))
 
 
+# sample
 set.seed(1)
 concept_pair_count_merge_sample = concept_pair_count_merge[confidence_count > 0,.SD[sample(.N, min(10,.N))],by = .(confidence_count,confidence)]
 con <- dbConnect(RMariaDB::MariaDB(), group = "ncats")
@@ -110,3 +111,24 @@ colnames(concept_name) = c("concept_name_2","concept_id_2")
 concept_pair_count_merge_sample = merge(concept_pair_count_merge_sample,concept_name,all.y = F,by='concept_id_2')
 
 concept_pair_count_merge_sample %>% fwrite(file = "./novel_identified_DPA_sample_200_seed_1.csv")
+
+
+# DMD
+concept_pair_count_merge_example = concept_pair_count_merge[concept_id_1 == 80010679]
+con <- dbConnect(RMariaDB::MariaDB(), group = "ncats")
+res <- dbSendQuery(con, "
+                   SELECT 
+                   c.concept_name,
+                   c.concept_id
+                   FROM concept c
+                   ")
+concept_name = dbFetch(res) %>% as.data.table()
+dbClearResult(res)
+colnames(concept_name) = c("concept_name_1","concept_id_1")
+concept_pair_count_merge_example = merge(concept_pair_count_merge_example,concept_name,all.y = F,by='concept_id_1')
+colnames(concept_name) = c("concept_name_2","concept_id_2")
+concept_pair_count_merge_example = merge(concept_pair_count_merge_example,concept_name,all.y = F,by='concept_id_2')
+
+concept_pair_count_merge_example %>% fwrite(file = "./novel_identified_DPA_example_seed_1.csv")
+
+
