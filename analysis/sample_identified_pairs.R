@@ -129,6 +129,6 @@ concept_pair_count_merge_example = merge(concept_pair_count_merge_example,concep
 colnames(concept_name) = c("concept_name_2","concept_id_2")
 concept_pair_count_merge_example = merge(concept_pair_count_merge_example,concept_name,all.y = F,by='concept_id_2')
 
-concept_pair_count_merge_example %>% fwrite(file = "./novel_identified_DPA_example_seed_1.csv")
+concept_pair_count_merge_example %>% fwrite(file = "./novel_identified_DMD_example.csv")
 
 
