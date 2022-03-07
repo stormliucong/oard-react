@@ -6,7 +6,7 @@ This is a React web app to serve the web app of OARD. The backend is provided by
 ![overview](overview.png)
 
 ## How to use OARD
-[Use web app](./tutorial/overview.png)
+[Use web app](./tutorial)
 [Use API ](https://smart-api.info/ui/aed21cd6828e18de3fa2da6a76574520)
 
 
