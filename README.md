@@ -1,4 +1,6 @@
-## <img src="./public/OARD_logo.png" width="50">An Open Real-world based Annotation for Rare Diseases and its Associated Phenotypes
+## <img src="./public/OARD_logo.png" width="50"> OARD (An acronym form of ["oh alright"](https://www.urbandictionary.com/define.php?term=oard)): an **O**pen real-world based **A**nnotation for **R**are **D**iseases and its associated phenotypes
+
+
 This is a React web app to serve the web app of OARD. The backend is provided by OARD API. Currently it is hosted on the 
 [NCATS AWS server (https://rare.cohd.io/)](https://rare.cohd.io/). This repo currenly only have the React web app part. The backend Flask API is hosted in another repo. We expect to merge two repos in the near future.
 
