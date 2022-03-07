@@ -5,6 +5,11 @@ This is a React web app to serve the web app of OARD. The backend is provided by
 ## An overview of OARD project
 ![overview](overview.png)
 
+## How to use OARD
+[Use web app](./tutorial/overview.png)
+[Use API ](https://smart-api.info/ui/aed21cd6828e18de3fa2da6a76574520)
+
+
 
 ## Requirements
 You need to install three packages on your machine:

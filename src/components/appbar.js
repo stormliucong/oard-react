@@ -14,8 +14,11 @@ import MenuItem from '@mui/material/MenuItem';
 
 const pages = [
     {'name': 'API','href': 'https://smart-api.info/ui/aed21cd6828e18de3fa2da6a76574520'},
-    {'name': 'GitHub (Contact)', 'href': 'https://github.com/stormliucong/oard-react'},
+    {'name': 'GitHub', 'href': 'https://github.com/stormliucong/oard-react'},
+    {'name': 'About', 'href': 'https://github.com/stormliucong/oard-react'},
     {'name': 'COHD', 'href': 'https://cohd.io/'},
+    {'name': 'WengLab', 'href': 'https://people.dbmi.columbia.edu/~chw7007/'},
+    {'name': 'CUIMC/DBMI', 'href': 'https://www.dbmi.columbia.edu/'},
 ];
 
 const AppBarComp = () => {
