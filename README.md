@@ -2,7 +2,7 @@
 
 
 This is a React web app to serve the web app of OARD. The backend is provided by OARD API. Currently it is hosted on the 
-[NCATS AWS server (https://rare.cohd.io/)](https://rare.cohd.io/). This repo currenly only have the React web app part. The backend Flask API is hosted in another repo. We expect to merge two repos in the near future.
+[NCATS AWS server (https://rare.cohd.io/)](https://rare.cohd.io/). This repo currenly only have the React web app part. The backend Flask API is hosted in another [repo](https://github.com/stormliucong/cohd-rare). We expect to merge two repos in the near future.
 
 ## An overview of OARD project
 ![overview](overview.png)
