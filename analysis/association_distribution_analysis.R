@@ -22,13 +22,19 @@ concept_pair_stat = concept_pair[dataset_id == 2,.(concept_id_1,concept_id_2,chi
 # read and process annotation file
 ####################################
 hpo_anno = fread("./phenotype.hpoa")
+hpo_anno = hpo_anno[Qualifier != "NOT"]
+hpo_anno[, Source:= 'Curated in database']
+pub_anno = fread("./pubcasefinder_dpa.csv")
+pub_anno$disease_id = pub_anno$disease_id %>% str_replace("Orphanet","ORPHA") # Orphanet => ORPHA
+colnames(pub_anno) = c('DatabaseID','HPO_ID')
+pub_anno[, Source:= 'Identified in literature']
+pair_anno = rbind(hpo_anno,pub_anno,fill = TRUE) %>% as.data.table()
 mondoXref = fread("./mondo_xref.csv")
 colnames(mondoXref) = c("MONDO_ID","DatabaseID")
 mondoXref$DatabaseID = mondoXref$DatabaseID %>% str_replace("Orphanet","ORPHA") # Orphanet => ORPHA
-pair_anno = hpo_anno %>% inner_join(mondoXref) %>% as.data.table()
-pair_anno = pair_anno %>% filter(Qualifier != "NOT")
-pair_anno = pair_anno %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
-pair_anno = pair_anno %>% as.data.table()
+pair_anno = merge(pair_anno,mondoXref,by = 'DatabaseID',all = F,allow.cartesian=T)
+pair_anno[,pair_name := paste0(MONDO_ID,"-",HPO_ID)]
+
 
 ####################################
 # map concept id and code
@@ -59,11 +65,11 @@ colnames(concept_pair_anno)[dim(concept_pair_anno)[2]] = 'concept_id_2'
 ####################################
 # generate annotated dist
 ####################################
-concept_pair_full_stat = merge(concept_pair_anno[,.(.N),by=.(concept_id_1,concept_id_2)],concept_pair_stat,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
-concept_pair_anno_dist = concept_pair_full_stat[!is.na(N)]
-concept_pair_anno_dist[,distribution := "annotated"]
-concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_2 %in% unique(concept_pair_anno_dist$concept_id_2) & concept_id_1 < 90000000]
-concept_pair_nonanno_dist[,distribution := "not_annotated"]
+concept_pair_full_stat = merge(concept_pair_anno[,.(.N),by=.(concept_id_1,concept_id_2,Source)],concept_pair_stat,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
+concept_pair_anno_dist = concept_pair_full_stat[!is.na(Source)]
+concept_pair_anno_dist[,distribution := Source]
+concept_pair_nonanno_dist = concept_pair_full_stat[is.na(Source) & concept_id_2 %in% unique(concept_pair_anno_dist$concept_id_2) & concept_id_1 < 90000000]
+concept_pair_nonanno_dist[,distribution := "No prior annotations"]
 concept_pair_dist = rbind(concept_pair_anno_dist,concept_pair_nonanno_dist)
 
 ##################
@@ -77,7 +83,6 @@ dist6a = concept_pair_dist %>%
   mutate(stat = as.factor(stat)) %>% 
   mutate(distribution = as.factor(distribution))
 levels(dist6a$stat) = c("Chi Square (log)", "Jaccard Index (log)", " Odds ratio (log)")
-levels(dist6a$distribution) = c("Annotated", "Not annotated")
 
 figa = dist6a %>%
   ggplot(aes(y = value,x = distribution,color = distribution)) + 
@@ -85,17 +90,26 @@ figa = dist6a %>%
   facet_wrap(~stat, scales = "free") +
   labs(title = "(A)") +
   ylab("") + 
-  theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
+  xlab("") + 
+  labs(color='Annotation Status') +
+  theme(plot.title = element_text(hjust = 0.5), legend.position = "right",axis.text.x = element_blank())
 
 ##################
 # fig 6b p-value rank
 ##################
+concept_pair_full_stat = merge(concept_pair_anno[Source=='Curated in database'][,.(.N),by=.(concept_id_1,concept_id_2)],concept_pair_stat,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
+concept_pair_anno_dist = concept_pair_full_stat[!is.na(N)]
+concept_pair_anno_dist[,distribution := "annotated"]
+concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_2 %in% unique(concept_pair_anno_dist$concept_id_2) & concept_id_1 < 90000000]
+concept_pair_nonanno_dist[,distribution := "not_annotated"]
+concept_pair_dist = rbind(concept_pair_anno_dist,concept_pair_nonanno_dist)
+
 wilcox_chisquare = concept_pair_dist[,if (.N > 100L) .(p = wilcox.test(chisquare ~ distribution,
-                                                                      exact = FALSE,alternative = "greater")$p.value),by = concept_id_2]
-wilcox_odds_ratio = concept_pair_dist[,if (.N > 100L) .(p = wilcox.test(odds_ratio ~ distribution,
                                                                        exact = FALSE,alternative = "greater")$p.value),by = concept_id_2]
+wilcox_odds_ratio = concept_pair_dist[,if (.N > 100L) .(p = wilcox.test(odds_ratio ~ distribution,
+                                                                        exact = FALSE,alternative = "greater")$p.value),by = concept_id_2]
 wilcox_jaccard_index = concept_pair_dist[,if (.N > 100L) .(p = wilcox.test(jaccard_index ~ distribution,
-                                                                          exact = FALSE,alternative = "greater")$p.value),by = concept_id_2]
+                                                                           exact = FALSE,alternative = "greater")$p.value),by = concept_id_2]
 
 wilcox_chisquare[,stat := "Chi Square"]
 wilcox_odds_ratio[,stat := "Odds ratio"]
@@ -110,12 +124,11 @@ figb = wilcox_p %>%
   xlab("") + 
   theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
 
-
 ##################
 # fig 6c delta value by Evidence
 ##################
 
-dist6b = merge(concept_pair_dist,concept_pair_anno[,.(concept_id_1,concept_id_2,Evidence)],all.x = T)
+dist6b = merge(concept_pair_dist,concept_pair_anno[Source=='Curated in database'][,.(concept_id_1,concept_id_2,Evidence)],all.x = T)
 dist6b_annotated = dist6b[!is.na(Evidence)]
 dist6b_annotated = dist6b_annotated %>% group_by(concept_id_2,Evidence) %>%
   summarise(chisquare_m = median(log(chisquare)),odds_ratio_m = median(odds_ratio),jaccard_index_m = median(log(jaccard_index)) ) %>%
@@ -147,11 +160,11 @@ figc = dist6b %>%
   theme(plot.title = element_text(hjust = 0.5), legend.position = "right")
 
 ##################
-# fig 6c delta value by Frequency
+# fig 6d delta value by Frequency
 ##################
 
 
-dist6c = merge(concept_pair_dist,concept_pair_anno[,.(concept_id_1,concept_id_2,Frequency)],all.x = T)
+dist6c = merge(concept_pair_dist,concept_pair_anno[Source=='Curated in database'][,.(concept_id_1,concept_id_2,Frequency)],all.x = T)
 dist6c_annotated = dist6c[Frequency %in% c("HP:0040284", "HP:0040282", "HP:0040281", "HP:0040283")]
 dist6c_annotated = dist6c_annotated %>% group_by(concept_id_2,Frequency) %>%
   summarise(chisquare_m = median(log(chisquare)),odds_ratio_m = median(odds_ratio),jaccard_index_m = median(log(jaccard_index)) ) %>%
@@ -172,9 +185,6 @@ dist6c = dist6c %>%
   mutate(Frequency = as.factor(Frequency))
 levels(dist6c$stat) = c("Chi Square (log)", "Jaccard Index (log)", " Odds ratio (log)")
 levels(dist6c$Frequency) = c("Very frequent","Frequent","Occasional","Very rare")
-# IEA (inferred from electronic annotation)
-# PCS published clinical study
-# TAS “traceable author statement”,
 figd = dist6c %>%
   ggplot(aes(y = value,color = Frequency, x= "")) + 
   geom_boxplot() + 
@@ -183,6 +193,7 @@ figd = dist6c %>%
   labs(title = "(D)") +
   xlab("") + 
   theme(plot.title = element_text(hjust = 0.5), legend.position = "right")
+
 
 require(gridExtra)
 lay <- rbind(c(1,1,2,2),
@@ -195,7 +206,7 @@ grid.arrange(figa, figb, figc, figd,layout_matrix = lay)
 for_rs_test = concept_pair_dist %>% 
   group_by(concept_id_2,distribution) %>%
   summarise(chisquare_m = median(chisquare),odds_ratio_m = median(odds_ratio),jaccard_index_m = median(jaccard_index) ) %>%
-  as.data.table() %>% dcast(concept_id_1~distribution,value.var=c("chisquare_m","odds_ratio_m","jaccard_index_m"))
+  as.data.table() %>% dcast(concept_id_2~distribution,value.var=c("chisquare_m","odds_ratio_m","jaccard_index_m"))
 x = for_rs_test[,chisquare_m_annotated]
 y = for_rs_test[,chisquare_m_not_annotated]
 wilcox.test(x, y, paired = TRUE, alternative = "greater")

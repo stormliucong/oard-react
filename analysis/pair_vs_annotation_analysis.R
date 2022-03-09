@@ -17,12 +17,18 @@ library(jsonlite)
 # read and process annotation file
 ####################################
 hpo_anno = fread("./phenotype.hpoa")
+hpo_anno = hpo_anno[Qualifier != "NOT",.(DatabaseID,HPO_ID)]
+hpo_anno[, Source:= 'HPO']
+pub_anno = fread("./pubcasefinder_dpa.csv")
+pub_anno$disease_id = pub_anno$disease_id %>% str_replace("Orphanet","ORPHA") # Orphanet => ORPHA
+colnames(pub_anno) = c('DatabaseID','HPO_ID')
+pub_anno[, Source:= 'Pubcasefinder']
+pair_anno = rbind(hpo_anno,pub_anno) %>% as.data.table()
 mondoXref = fread("./mondo_xref.csv")
 colnames(mondoXref) = c("MONDO_ID","DatabaseID")
 mondoXref$DatabaseID = mondoXref$DatabaseID %>% str_replace("Orphanet","ORPHA") # Orphanet => ORPHA
-pair_anno = hpo_anno %>% inner_join(mondoXref) %>% as.data.table()
-pair_anno = pair_anno %>% filter(Qualifier != "NOT")
-pair_anno = pair_anno %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
+pair_anno = merge(pair_anno,mondoXref,by = 'DatabaseID',all = F,allow.cartesian=T)
+pair_anno[,pair_name := paste0(MONDO_ID,"-",HPO_ID)]
 
 
 # Connect to my-db as defined in /.ncats.cnf
@@ -61,7 +67,8 @@ pair_dt2 = pairCount %>% filter(dataset_id == 2)
 pair_dt3 = pairCount %>% filter(dataset_id == 3)
 
 vennListA = list(
-  `HPO annotation` = pair_anno$pair_name,
+  `HPO annotation` = pair_anno[Source=='HPO']$pair_name,
+  `Pubcase annotation` = pair_anno[Source=='Pubcasefinder']$pair_name,
   `CUIMC/Notes` = pair_dt2$pair_name,
   `CHOP/Notes` = pair_dt3$pair_name
 )
@@ -98,13 +105,13 @@ pairRawCount = raw_concept_pair_2 %>%
 
 pairRawCount = pairRawCount %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
 vennListB = list(
-  `HPO annotation` = pair_anno$pair_name,
-  `CUIMC/Notes` = pairRawCount$pair_name,
-  `CHOP/Notes` = pair_dt3$pair_name
+  `HPO annotation` = pair_anno[Source=='HPO']$pair_name,
+  `Pubcase annotation` = pair_anno[Source=='Pubcasefinder']$pair_name,
+  `CUIMC/Notes` = pairRawCount$pair_name
 )
 fig4b = ggvenn(vennListB,
-               fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#CD534CFF"),
-               stroke_size = 0.5, set_name_size = 4)
+               fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF"),
+               stroke_size = 0.5, set_name_size = 3)
 
 ####################################
 # Figure 4c Venn Diagram for overlap 
@@ -135,29 +142,30 @@ pairRawHierCount = raw_concept_pair_299 %>%
 
 pairRawHierCount = pairRawHierCount %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
 vennListC = list(
-  `HPO annotation` = pair_anno$pair_name,
-  `CUIMC/Notes` = pairRawHierCount$pair_name,
+  `HPO annotation` = pair_anno[Source=='HPO']$pair_name,
+  `Pubcase annotation` = pair_anno[Source=='Pubcasefinder']$pair_name,
+  `CUIMC/Notes` = pairRawHierCount$pair_name
 )
 fig4c = ggvenn(vennListC,
-               fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#CD534CFF"),
-               stroke_size = 0.5, set_name_size = 4)
+               fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF"),
+               stroke_size = 0.5, set_name_size = 3)
 
 ####################################
 # Figure 4d Venn Diagram for overlap 
 # with > 10 single concept count only
 ####################################
 
-pair_anno_hpo_const = pair_anno %>% inner_join(singleCount %>% select("concept_code"),by = c("MONDO_ID"="concept_code"))
-pair_anno_mondo_const = pair_anno %>% inner_join(singleCount %>% select("concept_code"),by = c("HPO_ID"="concept_code"))
+pair_anno_hpo_const = pair_anno %>% inner_join(singleCount %>% select("concept_code"),by = c("MONDO_ID"="concept_code")) %>% as.data.table()
+pair_anno_mondo_const = pair_anno %>% inner_join(singleCount %>% select("concept_code"),by = c("HPO_ID"="concept_code")) %>% as.data.table()
 
 vennListD = list(
-  `HPO annotation` = intersect(pair_anno_hpo_const$pair_name,pair_anno_mondo_const$pair_name),
-  `CUIMC/Notes` = pairRawHierCount$pair_name,
-  `CHOP/Notes` = pair_dt3$pair_name
+  `HPO annotation` = intersect(pair_anno_hpo_const[Source=='HPO']$pair_name,pair_anno_mondo_const[Source=='HPO']$pair_name),
+  `Pubcase annotation` = intersect(pair_anno_hpo_const[Source=='Pubcasefinder']$pair_name,pair_anno_mondo_const[Source=='Pubcasefinder']$pair_name),
+  `CUIMC/Notes` = pairRawHierCount$pair_name
 )
 fig4d = ggvenn(vennListD,
-            fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF", "#CD534CFF"),
-            stroke_size = 0.5, set_name_size = 4)
+            fill_color = c("#0073C2FF", "#EFC000FF", "#868686FF"),
+            stroke_size = 0.5, set_name_size = 3)
 
 
 require(gridExtra)
@@ -169,11 +177,6 @@ fig4b = fig4b + labs(title = "(B) Raw OARD")+ theme(plot.title = element_text(hj
 fig4c = fig4c + labs(title = "(C) Raw hierachical OARD" )+ theme(plot.title = element_text(hjust = 0.5)) 
 fig4d = fig4d + labs(title = "(D) Raw hierachical OARD + single count > 10")+ theme(plot.title = element_text(hjust = 0.5)) 
 grid.arrange(fig4a, fig4b, fig4c,fig4d,layout_matrix = lay)
-
-
-
-###
-raw_concept_pair = fread("../../material/concept_pair/concept_pair.csv")
 
 
 
