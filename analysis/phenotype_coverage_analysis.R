@@ -88,7 +88,7 @@ fig2a = hitCountDf %>%
   geom_bar(position="dodge", stat="identity") + 
   xlab("Number of patients in the dataset") +
   ylab("Number of HPO concepts") + 
-  scale_fill_discrete(name="Dataset",
+  scale_fill_viridis_d(name="Dataset",
                       breaks=c("1", "2", "3"),
                       labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes"))+ 
   labs(title = "(A)") +
@@ -117,7 +117,7 @@ fig2b = subHitCountDf %>%
   scale_linetype_discrete(name="Dataset",
                           breaks=c(1, 2, 3),
                           labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_color_discrete(name="Dataset",
+  scale_color_viridis_d(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
   scale_size_continuous(name = "HPO subongoloty size (# of concepts)", breaks = c(10, 100, 1000)) + 
@@ -150,7 +150,7 @@ fig2c = rootHitCountDf %>%
   scale_linetype_discrete(name="Dataset",
                           breaks=c(1, 2, 3),
                           labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_color_discrete(name="Dataset",
+  scale_color_viridis_d(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
   scale_size_continuous(name = "# of total concepts", breaks = c(10, 100, 1000)) + 
@@ -188,7 +188,7 @@ fig2d = tokenHitCountDf %>%
   scale_linetype_discrete(name="Dataset",
                           breaks=c(1, 2, 3),
                           labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_color_discrete(name="Dataset",
+  scale_color_viridis_d(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
   scale_size_continuous(name = "# of total concepts", breaks = c(10, 100, 1000)) + 
@@ -229,7 +229,7 @@ fig2e = stringHitCountDf %>%
   scale_linetype_discrete(name="Dataset",
                           breaks=c(1, 2, 3),
                           labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_color_discrete(name="Dataset",
+  scale_color_viridis_d(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
   scale_size_continuous(name = "# of total concepts", breaks = c(10, 100, 1000)) + 
@@ -267,7 +267,7 @@ fig2f = posHitCountDf %>%
   scale_linetype_discrete(name="Dataset",
                           breaks=c(1, 2, 3),
                           labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_color_discrete(name="Dataset",
+  scale_color_viridis_d(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
   scale_size_continuous(name = "# of total concepts", breaks = c(1000,10000,100000)) + 
@@ -305,7 +305,7 @@ fig2g = patternHitCountDf %>%
   scale_linetype_discrete(name="Dataset",
                           breaks=c(1, 2, 3),
                           labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_color_discrete(name="Dataset",
+  scale_color_viridis_d(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
   scale_size_continuous(name = "# of total concepts", breaks = c(1000,10000,100000)) + 
