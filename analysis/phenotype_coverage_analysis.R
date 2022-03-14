@@ -107,8 +107,7 @@ subHitCountDf = hitCountDf %>% inner_join(disToRootDf[,.(hp_id,sub_class)] %>% u
                                              hits = sum(hpo_count > 0)) %>%
   mutate(ratio = hits/(no_hits+hits))
 fig2b = subHitCountDf %>%
-  ggplot(aes(y=ratio,x=hp_name,group = as.factor(dataset_id))) + 
-  geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
+  ggplot(aes(y=ratio,x=hp_name,group = as.factor(dataset_id))) +
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
   xlab("") +
   ylab("Ratio of HPO concepts >= 10 pts") + 
@@ -121,7 +120,7 @@ fig2b = subHitCountDf %>%
   scale_color_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_size_continuous(name = "# of total concepts", breaks = c(10, 100, 1000)) + 
+  scale_size_continuous(name = "HPO subongoloty size (# of concepts)", breaks = c(10, 100, 1000)) + 
   labs(title = "(B)",color = "Dataset", shape  = "Dataset", linetype = "Dataset", size = "# of total concepts") +
   theme(plot.title = element_text(hjust = 0.5)) + coord_flip()
 
@@ -142,7 +141,6 @@ rootHitCountDf = hitCountDf %>% inner_join(disToRootDf %>% select(hp_id,dist_to_
   select(dataset_id, dist_to_root, hits, no_hits, ratio) %>% as_tibble()
 fig2c = rootHitCountDf %>%
   ggplot(aes(y=ratio,x=as.numeric(dist_to_root), group = as.factor(dataset_id))) + 
-  geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
   xlab("Distance to root") +
   ylab("") + 
@@ -160,6 +158,7 @@ fig2c = rootHitCountDf %>%
   scale_y_continuous(breaks = seq(0, 1, by = 0.25),labels = seq(0, 1, by = 0.25),limits = c(0,1)) +
   labs(title = "(C)",color = "Dataset", shape  = "Dataset", linetype = "Dataset", size = "# of total concepts") +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45)) + 
   theme(legend.position="none")
 
 ###########################
@@ -180,7 +179,6 @@ tokenHitCountDf = hitCountDf %>% inner_join(tokenLenDf) %>%
 
 fig2d = tokenHitCountDf %>%
   ggplot(aes(y=ratio,x=as.numeric(min_token_count), group = as.factor(dataset_id))) + 
-  geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
   xlab("Number of tokens") +
   ylab("") + 
@@ -198,6 +196,7 @@ fig2d = tokenHitCountDf %>%
   scale_y_continuous(breaks = seq(0, 1, by = 0.25),labels = seq(0, 1, by = 0.25),limits = c(0,1)) + 
   labs(title = "(D)",color = "Dataset", shape  = "Dataset", linetype = "Dataset", size = "# of total concepts") +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45)) + 
   theme(legend.position="none")
 
 ###########################
@@ -222,7 +221,6 @@ stringHitCountDf = hitCountDf %>% inner_join(charLenDf) %>%
 fig2e = stringHitCountDf %>%
   ggplot(aes(y=ratio,x=as.factor(min_avg_string_length_bin), group = as.factor(dataset_id))) + 
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
-  geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
   xlab("String length") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
@@ -238,6 +236,7 @@ fig2e = stringHitCountDf %>%
   scale_y_continuous(breaks = seq(0, 1, by = 0.25),labels = seq(0, 1, by = 0.25),limits = c(0,1)) +
   labs(title = "(E)",color = "Dataset", shape  = "Dataset", linetype = "Dataset", size = "# of total concepts") +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45)) + 
   theme(legend.position="none")
 
 
@@ -260,7 +259,6 @@ posHitCountDf = hitCountDf %>% inner_join(posTagDfSub) %>%
 fig2f = posHitCountDf %>%
   ggplot(aes(y=ratio,x=as.factor(pos_tag), group = as.factor(dataset_id))) + 
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
-  geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
   xlab("POS") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
@@ -276,6 +274,7 @@ fig2f = posHitCountDf %>%
   scale_y_continuous(breaks = seq(0, 1, by = 0.25),labels = seq(0, 1, by = 0.25),limits = c(0,1)) +
   labs(title = "(F)",color = "Dataset", shape  = "Dataset", linetype = "Dataset", size = "# of total concepts") +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45)) + 
   theme(legend.position="none")
 
 ###########################
@@ -298,7 +297,6 @@ patternHitCountDf = hitCountDf %>% inner_join(patternDfSub) %>%
 fig2g = patternHitCountDf %>%
   ggplot(aes(y=ratio,x=as.factor(ontology), group = as.factor(dataset_id))) + 
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
-  geom_line(aes(linetype=as.factor(dataset_id),color = as.factor(dataset_id))) +
   xlab("Design ontology") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
@@ -314,6 +312,7 @@ fig2g = patternHitCountDf %>%
   scale_y_continuous(breaks = seq(0, 1, by = 0.25),labels = seq(0, 1, by = 0.25),limits = c(0,1)) +
   labs(title = "(G)",color = "Dataset", shape  = "Dataset", linetype = "Dataset", size = "# of total concepts") +
   theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45)) + 
   theme(legend.position="none")
 
 
