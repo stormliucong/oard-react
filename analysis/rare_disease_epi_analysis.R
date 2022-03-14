@@ -66,7 +66,7 @@ fig3a = overallHitCountDf %>%
   scale_x_discrete(name="Dataset",
                       breaks=c("1", "2", "3"),
                       labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes"))+ 
-  scale_fill_discrete(name="EHR Prevalence",
+  scale_fill_viridis_d(name="EHR Prevalence",
                    breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
                    labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
   coord_flip() +
@@ -95,18 +95,21 @@ prevHitCount = prevHitCount %>% filter(!annotation_class %in% c("Unknown_epidemi
 prevHitCount = prevHitCount %>% mutate(annotation_class = as.factor(annotation_class))
 prevHitCount$annotation_class = factor(prevHitCount$annotation_class, levels = 
                                          c("<1 / 1 000 000", "1-9 / 1 000 000","1-9 / 100 000","1-9 / 10 000"))
+prevHitCount = prevHitCount %>% group_by(dataset_id,prev_bin,annotation_class) %>% summarise(count_of_concepts = sum(count_of_concepts))
 
 fig3b = prevHitCount %>% 
   ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
   geom_bar(position="fill", stat="identity") + 
-  xlab("Point prevalence range in OAPHANET ") +
-  ylab("Number of rare diseases") + 
+  xlab("Point prevalence range in the Orphanet ") +
+  ylab("Ratio of rare diseases") + 
   coord_flip() + facet_wrap(~dataset_id) +
-  scale_fill_discrete(name="EHR Prevalence",
+  scale_fill_viridis_d(name="EHR Prevalence",
                       breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
                       labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
-  labs(title = "(C)") +
+  labs(title = "(B)") +
   theme(plot.title = element_text(hjust = 0.5))
+
+prevHitCount %>% group_by(dataset_id, annotation_class) %>% mutate(bin_count = sum(count_of_concepts)) %>% mutate(ratio = count_of_concepts/bin_count) %>% filter(dataset_id == 'CUIMC/Notes')
 
 ########################################
 # figure 3c
@@ -132,13 +135,15 @@ inherHitCount = inherHitCount %>% filter(!annotation_class %in% c("Y-linked","ol
 # ))
 # levels(onsetHitCount$annotation_class)[9] = "no available"
 
+inherHitCount = inherHitCount %>% group_by(dataset_id,prev_bin,annotation_class) %>% summarise(count_of_concepts = sum(count_of_concepts))
+
 fig3c = inherHitCount %>% 
   ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
   geom_bar(position="fill", stat="identity") + 
-  xlab("Inheritance mode in OAPHANET ") +
-  ylab("Number of rare diseases") + 
+  xlab("Inheritance mode in the Orphanet ") +
+  ylab("Ratio of rare diseases") + 
   coord_flip() + facet_wrap(~dataset_id) +
-  scale_fill_discrete(name="EHR Prevalence",
+  scale_fill_viridis_d(name="EHR Prevalence",
                       breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
                       labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
   labs(title = "(C)") +
@@ -164,14 +169,15 @@ onsetHitCount$annotation_class = factor(onsetHitCount$annotation_class, levels =
   "antenatal","neonatal","infancy","childhood","adolescent","adult","elderly","all ages","no age of onset data available"
 ))
 levels(onsetHitCount$annotation_class)[9] = "no available"
+onsetHitCount = onsetHitCount %>% group_by(dataset_id,prev_bin,annotation_class) %>% summarise(count_of_concepts = sum(count_of_concepts))
 
 fig3d = onsetHitCount %>% 
   ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
   geom_bar(position="fill", stat="identity") + 
-  xlab("Onset age in OAPHANET ") +
-  ylab("Number of rare diseases") + 
+  xlab("Onset age in the Orphanet ") +
+  ylab("Ratio of rare diseases") + 
   coord_flip() + facet_wrap(~dataset_id) +
-  scale_fill_discrete(name="EHR Prevalence",
+  scale_fill_viridis_d(name="EHR Prevalence",
                       breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
                       labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
   labs(title = "(D)") +
@@ -226,7 +232,7 @@ onsetHitOnsetCount = hitAgeCountDf %>% inner_join(mondoXref) %>% inner_join(onse
   mutate(dataset_id = as.factor(dataset_id)) %>%
   mutate(annotation_class = as.factor(annotation_class))
 levels(onsetHitOnsetCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
-levels(onsetHitOnsetCount$dataset_id) = c("neonatal", "young kid", "teenage","adult")
+levels(onsetHitOnsetCount$dataset_id) = c("neonatal & early life", "childhood", "adolescent","adult")
 onsetHitOnsetCount$annotation_class = factor(onsetHitOnsetCount$annotation_class, levels = c(
   "antenatal","neonatal","infancy","childhood","adolescent","adult","elderly","all ages","no age of onset data available"
 ))
@@ -235,12 +241,12 @@ levels(onsetHitOnsetCount$annotation_class)[9] = "no available"
 efig1 = onsetHitOnsetCount %>% 
   ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
   geom_bar(position="fill", stat="identity") + 
-  xlab("Onset age in OAPHANET ") +
-  ylab("Number of rare diseases") + 
+  xlab("Onset age in the Orphanet ") +
+  ylab("Ratio of rare diseases") + 
   coord_flip() + facet_wrap(~dataset_id) +
-  scale_fill_discrete(name="EHR Prevalence",
+  scale_fill_viridis_d(name="EHR Prevalence",
                       breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
                       labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
   labs(title = "eFigure 1") +
   theme(plot.title = element_text(hjust = 0.5))
-
+efig1
