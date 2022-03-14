@@ -12,6 +12,11 @@ library(ggvenn)
 library(httr)
 library(jsonlite)
 library(stringr)
+library(RColorBrewer)
+library(scales)
+
+options( scipen = 1 )
+
 
 dt_meta = fread("./dataset_meta_20220203.csv")
 dt_meta$subclass_category = str_trim(dt_meta$subclass_category)
@@ -23,7 +28,7 @@ dt_meta1a = dt_meta %>%
   select(dataset_id,subclass_category,pt_count,concept_count,concept_pair_count) %>%
   gather(key = target, value = count,pt_count, concept_count, concept_pair_count,factor_key = T) %>%
   mutate(subclass_category = factor(subclass_category,levels = c(
-    "all","hierachical","adult (18-99)","teenage (2-17)","kid (3-11)","neonates (0-2)"
+    "all","hierachical","adult (18-99)","teenage (12-17)","kid (3-11)","neonate & early life (0-2)"
   )))
 levels(dt_meta1a$target) = c("Total patient count","Total concept count","Total concept pair count")
 dt_meta1a$dataset_id = factor(dt_meta1a$dataset_id,levels = c("cuimc/ohdsi","cuimc/notes","chop/notes"))
@@ -32,12 +37,11 @@ fig1a = dt_meta1a %>%
   ggplot(aes(x=subclass_category,fill=dataset_id,y=count)) +
   geom_bar(position = "dodge",stat = "identity") +
   facet_grid(~target,scales = "free") +
-  labs(title = "(A)") +
-  scale_fill_discrete(name="Dataset",
-                       breaks=c("cuimc/ohdsi", "cuimc/notes", "chop/notes"),
-                       labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  
+  labs(title = "(A)") + scale_fill_viridis_d(name="Dataset",
+                                             breaks=c("cuimc/ohdsi", "cuimc/notes", "chop/notes"),
+                                             labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) +
   theme(plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) +
   xlab("") +
   ylab("") +
   coord_flip() +
@@ -59,11 +63,12 @@ fig1b = dt_meta1b %>%
   facet_grid(~target,scales = "free") +
   labs(title = "(B)") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  scale_fill_discrete(name="Dataset",
+  scale_fill_viridis_d(name="Dataset",
                       breaks=c("cuimc/ohdsi", "cuimc/notes", "chop/notes"),
                       labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes"),drop = FALSE) + 
   xlab("") +
   ylab("count") +
+  scale_y_continuous(labels = scales::comma) +
   theme(legend.position="none")
 
 
