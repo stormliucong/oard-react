@@ -535,7 +535,7 @@ class MainComp extends Component {
                     <List aria-label="mailbox folders" sx={{ display: 'flex',flexDirection:"column",alignItems:"stretch"}}>
                         {this.state.apiResultsDisplay &&
                             <ListSubheader>
-                                {this.state.apiResults.length} Results returned
+                                {this.state.apiResults.length} Results returned. Please note if the count number is less than ten, no results will be returned.
                             </ListSubheader>
                         }
                         {this.state.apiResultsDisplay &&
