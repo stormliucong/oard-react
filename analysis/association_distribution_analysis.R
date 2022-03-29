@@ -7,14 +7,15 @@ library(dplyr)
 library(tidyr)
 library(DBI)
 library(stringr)
-library(ggvenn)
+# library(ggvenn)
 library(httr)
 library(jsonlite)
 
 ####################################
 # load concept pair association
 ####################################
-concept_pair = get(load(file = "./concept_pair.rda"))
+source("./generate_pairwise_statistics.R")
+# concept_pair = get(load(file = "./concept_pair.rda"))
 
 concept_pair_stat = concept_pair[dataset_id == 2,.(concept_id_1,concept_id_2,chisquare,odds_ratio,jaccard_index)]
 

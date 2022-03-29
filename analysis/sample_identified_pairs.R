@@ -1,39 +1,39 @@
 # Author: Cong Liu
 
 rm(list=ls())
-library(data.table)
-library(ggplot2)
 library(dplyr)
+library(data.table)
 library(tidyr)
 library(DBI)
 library(stringr)
-library(ggvenn)
+# library(ggvenn)
 library(httr)
 library(jsonlite)
 
 ####################################
 # load concept pair association
 ####################################
-concept_pair = get(load(file = "./concept_pair.rda"))
+source("./generate_pairwise_statistics.R") # only get CUIMC/Notes data to save memory.
+# concept_pair = get(load(file = "./concept_pair.rda"))
 
 concept_pair_stat = concept_pair[dataset_id == 2,.(concept_id_1,concept_id_2,chisquare,odds_ratio,jaccard_index)]
 
 ####################################
 # read and process annotation file
 ####################################
-hpo_anno = fread("./phenotype.hpoa")
-mondoXref = fread("./mondo_xref.csv")
+hpo_anno = fread("../../material/phenotype.hpoa")
+mondoXref = fread("../../material/mondo_xref.csv")
 colnames(mondoXref) = c("MONDO_ID","DatabaseID")
 mondoXref$DatabaseID = mondoXref$DatabaseID %>% str_replace("Orphanet","ORPHA") # Orphanet => ORPHA
-pair_anno = hpo_anno %>% inner_join(mondoXref) %>% as.data.table()
-pair_anno = pair_anno %>% filter(Qualifier != "NOT")
-pair_anno = pair_anno %>% mutate(pair_name = paste0(MONDO_ID,"-",HPO_ID))
-pair_anno = pair_anno %>% as.data.table()
+pair_anno = merge(hpo_anno,mondoXref,allow.cartesian=TRUE) %>% as.data.table()
+pair_anno = pair_anno[Qualifier != "NOT"]
+pair_anno[,pair_name := paste0(MONDO_ID,"-",HPO_ID)]
 
 ####################################
 # map concept id and code
 ####################################
-# Connect to my-db as defined in /.ncats.cnf
+# Connect to ncats as defined in ~/.my.cnf
+# Must use ~/.my.cnf to store t
 con <- dbConnect(RMariaDB::MariaDB(), group = "ncats")
 # extract concept hp mondo mapping
 res <- dbSendQuery(con, "
