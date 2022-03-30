@@ -84,11 +84,11 @@ concept_pair_bin_anno_count_lg_10 = concept_pair_bin_anno_lg_10[,.(.N),by=.(cate
 concept_pair_bin_anno_count_lg_10 = dcast(concept_pair_bin_anno_count_lg_10,category + stat ~ annotated, value.var = "N")
 concept_pair_bin_anno_count_lg_10 %>% ggplot(aes(x=as.factor(category),y=`TRUE`,fill=stat)) + geom_bar(stat="identity",position = "dodge")
 
-########
-# sample
-########
+################################
+# sample from each quantile
+################################
 set.seed(1)
-concept_pair_count_merge_sample = concept_pair_count_merge[confidence_count > 0,.SD[sample(.N, min(10,.N))],by = .(confidence_count,confidence)]
+disease_sample_400 = concept_pair_bin_anno_lg_10[annotated==FALSE,.(pairs_count = length(unique(concept_id_2))),by=(concept_id_1)][order(-pairs_count)][pairs_count > 1000][sample(.N,400)]
 con <- dbConnect(RMariaDB::MariaDB(), group = "ncats")
 res <- dbSendQuery(con, "
 SELECT 
@@ -99,29 +99,33 @@ FROM concept c
 concept_name = dbFetch(res) %>% as.data.table()
 dbClearResult(res)
 colnames(concept_name) = c("concept_name_1","concept_id_1")
-concept_pair_count_merge_sample = merge(concept_pair_count_merge_sample,concept_name,all.y = F,by='concept_id_1')
+disease_sample_400 = merge(disease_sample_400,concept_name,all.y = F,by='concept_id_1')
+disease_sample_100_1 = disease_sample_400[1:100]
+disease_sample_100_2 = disease_sample_400[101:200]
+disease_sample_100_3 = disease_sample_400[201:300]
+disease_sample_100_4 = disease_sample_400[301:400]
+
+# sample disease
+disease_sample_100_1 %>% fwrite(file = "./disease_sample_100_1.csv")
+disease_sample_100_2 %>% fwrite(file = "./disease_sample_100_2.csv")
+disease_sample_100_3 %>% fwrite(file = "./disease_sample_100_3.csv")
+disease_sample_100_4 %>% fwrite(file = "./disease_sample_100_4.csv")
+
+# sample pairs by category
 colnames(concept_name) = c("concept_name_2","concept_id_2")
-concept_pair_count_merge_sample = merge(concept_pair_count_merge_sample,concept_name,all.y = F,by='concept_id_2')
 
-concept_pair_count_merge_sample %>% fwrite(file = "./novel_identified_DPA_sample_200_seed_1.csv")
+disease_concept_pair_sample = merge(concept_pair_bin_anno_lg_10[stat == "odds_ratio"],disease_sample_100_1)[category > 5,.SD[sample(.N, 5)],by = .(concept_id_1,category)]
+disease_concept_pair_sample = merge(disease_concept_pair_sample,concept_name,all.y = F,by='concept_id_2')
+disease_concept_pair_sample %>% fwrite(file = "./pair_sample_100_1.csv")
+disease_concept_pair_sample = merge(concept_pair_bin_anno_lg_10[stat == "odds_ratio"],disease_sample_100_2)[category > 5,.SD[sample(.N, 5)],by = .(concept_id_1,category)]
+disease_concept_pair_sample = merge(disease_concept_pair_sample,concept_name,all.y = F,by='concept_id_2')
+disease_concept_pair_sample %>% fwrite(file = "./pair_sample_100_2.csv")
+disease_concept_pair_sample = merge(concept_pair_bin_anno_lg_10[stat == "odds_ratio"],disease_sample_100_3)[category > 5,.SD[sample(.N, 5)],by = .(concept_id_1,category)]
+disease_concept_pair_sample = merge(disease_concept_pair_sample,concept_name,all.y = F,by='concept_id_2')
+disease_concept_pair_sample %>% fwrite(file = "./pair_sample_100_3.csv")
+disease_concept_pair_sample = merge(concept_pair_bin_anno_lg_10[stat == "odds_ratio"],disease_sample_100_4)[category > 5,.SD[sample(.N, 5)],by = .(concept_id_1,category)]
+disease_concept_pair_sample = merge(disease_concept_pair_sample,concept_name,all.y = F,by='concept_id_2')
+disease_concept_pair_sample %>% fwrite(file = "./pair_sample_100_4.csv")
 
-
-# DMD
-concept_pair_count_merge_example = concept_pair_count_merge[concept_id_1 == 80010679]
-con <- dbConnect(RMariaDB::MariaDB(), group = "ncats")
-res <- dbSendQuery(con, "
-                   SELECT 
-                   c.concept_name,
-                   c.concept_id
-                   FROM concept c
-                   ")
-concept_name = dbFetch(res) %>% as.data.table()
-dbClearResult(res)
-colnames(concept_name) = c("concept_name_1","concept_id_1")
-concept_pair_count_merge_example = merge(concept_pair_count_merge_example,concept_name,all.y = F,by='concept_id_1')
-colnames(concept_name) = c("concept_name_2","concept_id_2")
-concept_pair_count_merge_example = merge(concept_pair_count_merge_example,concept_name,all.y = F,by='concept_id_2')
-
-concept_pair_count_merge_example %>% fwrite(file = "./novel_identified_DMD_example.csv")
 
 
