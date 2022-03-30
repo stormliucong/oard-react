@@ -9,6 +9,7 @@ library(stringr)
 # library(ggvenn)
 library(httr)
 library(jsonlite)
+library(ggplot2)
 
 ####################################
 # load concept pair association
@@ -59,41 +60,33 @@ colnames(concept_pair_anno)[dim(concept_pair_anno)[2]] = 'concept_id_2'
 ####################################
 # generate annotated dist
 ####################################
-concept_pair_full_stat = merge(concept_pair_anno[,.(.N),by=.(concept_id_1,concept_id_2)],concept_pair_stat,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
-concept_pair_anno_dist = concept_pair_full_stat[!is.na(N)]
-concept_pair_anno_dist[,distribution := "annotated"]
-concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_2 %in% unique(concept_pair_anno_dist$concept_id_2) & concept_id_1 < 90000000]
-concept_pair_nonanno_dist[,distribution := "not_annotated"]
-concept_pair_dist = rbind(concept_pair_anno_dist,concept_pair_nonanno_dist)
+concept_pair_stat = concept_pair_stat[concept_id_1 < 90000000 & concept_id_2 > 90000000] # disease - phenotype pair only.
+# generate quantile for concept_id_1.
+# use disease specific quantile if observed pair > 10
+concept_pair_stat_lg_10 = merge(concept_pair_stat[,.(.N),by=concept_id_1][N >= 10][,.(concept_id_1)], concept_pair_stat,all.y = F,all.x = T, by = "concept_id_1")
+concept_pair_stat_lg_10 = melt(concept_pair_stat_lg_10,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
+concept_pair_count_lg_10_anno_levels = concept_pair_stat_lg_10[,as.list(quantile(association, probs = c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9))),by=.(concept_id_1,stat)]
+concept_pair_count_lg_10_anno_levels = melt(concept_pair_count_lg_10_anno_levels,measure.vars = c("0%","10%","20%","30%","40%","50%","60%","70%","80%","90%"),variable.name = "confidence",value.name = "association_threshold")
+concept_pair_stat_lg_10 = merge(concept_pair_stat_lg_10,concept_pair_count_lg_10_anno_levels,by = c("concept_id_1","stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
+# use a general quantile if observed pair < 10
+# concept_pair_stat_sm_10 = merge(concept_pair_stat[,.(.N),by=concept_id_1][N < 10][,.(concept_id_1)], concept_pair_stat,all.y = F,all.x = T, by = "concept_id_1")
+# concept_pair_stat_sm_10 = melt(concept_pair_stat_sm_10,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
+# concept_pair_count_sm_10_anno_levels = concept_pair_stat_sm_10[,as.list(quantile(association, probs = c(0,0.25,0.5,0.75,1))),by=.(stat)]
+# concept_pair_count_sm_10_anno_levels = melt(concept_pair_count_sm_10_anno_levels,measure.vars = c("0%","25%","50%","75%","100%"),variable.name = "confidence",value.name = "association_threshold")
+# concept_pair_stat_sm_10 = merge(concept_pair_stat_sm_10,concept_pair_count_sm_10_anno_levels,by = c("stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
+# generate category
+concept_pair_stat_lg_10[,threshold_count := association >= association_threshold]
+concept_pair_bin_lg_10 = concept_pair_stat_lg_10[,.(category=sum(threshold_count)),by = .(concept_id_1,concept_id_2,stat)]
+# merge
+concept_pair_bin_anno_lg_10 = merge(concept_pair_anno[,.(.N),by=.(concept_id_1,concept_id_2)],concept_pair_bin_lg_10,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
+concept_pair_bin_anno_lg_10[,annotated := !is.na(N)]
+concept_pair_bin_anno_count_lg_10 = concept_pair_bin_anno_lg_10[,.(.N),by=.(category,stat,annotated)]
+concept_pair_bin_anno_count_lg_10 = dcast(concept_pair_bin_anno_count_lg_10,category + stat ~ annotated, value.var = "N")
+concept_pair_bin_anno_count_lg_10 %>% ggplot(aes(x=as.factor(category),y=`TRUE`,fill=stat)) + geom_bar(stat="identity",position = "dodge")
 
-
-##################
-# derive confident level
-##################
-# get backgroud
-concept_pair_count_lg_10 = concept_pair_anno_dist[,.(.N),by=concept_id_2][N >= 10]
-concept_pair_count_lg_10_anno_dist = merge(concept_pair_count_lg_10[,.(concept_id_2)], concept_pair_anno_dist,all.y = F,all.x = T, by = "concept_id_2")
-concept_pair_count_lg_10_anno_dist = melt(concept_pair_count_lg_10_anno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
-concept_pair_count_lg_10_anno_levels = concept_pair_count_lg_10_anno_dist[,as.list(quantile(association, probs = seq(0.5, 0.9, 0.1))),by=.(concept_id_2,stat)]
-concept_pair_count_lg_10_anno_levels = melt(concept_pair_count_lg_10_anno_levels,measure.vars = c("50%","60%","70%","80%","90%"),variable.name = "confidence",value.name = "association_threshold")
-concept_pair_count_sm_10 = concept_pair_anno_dist[,.(.N),by=concept_id_2][N < 10]
-concept_pair_count_sm_10_anno_dist = merge(concept_pair_count_sm_10[,.(concept_id_2)], concept_pair_anno_dist,all.y = F,all.x = T, by = "concept_id_2")
-concept_pair_count_sm_10_anno_dist = melt(concept_pair_count_sm_10_anno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
-concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_dist[,as.list(quantile(association, probs = seq(0.5, 0.9, 0.1))),by=.(concept_id_2,stat)]
-concept_pair_count_sm_10_anno_levels = melt(concept_pair_count_sm_10_anno_levels,measure.vars = c("50%","60%","70%","80%","90%"),variable.name = "confidence",value.name = "association_threshold")
-concept_pair_count_sm_10_anno_levels = concept_pair_count_sm_10_anno_levels[,.(association_threshold = median(association_threshold)),by=.(stat,confidence)]
-
-concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_1 %in% unique(concept_pair_anno_dist$concept_id_1) & concept_id_2 > 90000000]
-concept_pair_nonanno_dist = melt(concept_pair_nonanno_dist,measure.vars = c("chisquare","odds_ratio","jaccard_index"),variable.name = "stat", value.name = "association")
-concept_pair_count_lg_10_merge = merge(concept_pair_nonanno_dist,concept_pair_count_lg_10_anno_levels,by = c("concept_id_2","stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
-concept_pair_count_sm_10_merge = merge(concept_pair_nonanno_dist[!concept_id_2 %in% unique(concept_pair_count_lg_10_anno_levels$concept_id_2)],concept_pair_count_sm_10_anno_levels,by = c("stat"),all.x = F,all.y = F,allow.cartesian=TRUE)
-concept_pair_count_merge = rbind(concept_pair_count_lg_10_merge,concept_pair_count_sm_10_merge)
-concept_pair_count_merge = concept_pair_count_merge[,.(confidence_count = sum(association > association_threshold )),by=.(confidence,concept_id_2,concept_id_1)]
-concept_pair_count_confidence = concept_pair_count_merge[,.(count = .N),by=.(confidence,confidence_count)]
-confidence_nonannootated_dt = dcast(concept_pair_count_confidence, confidence ~ confidence_count, value.var = c("count"))
-
-
+########
 # sample
+########
 set.seed(1)
 concept_pair_count_merge_sample = concept_pair_count_merge[confidence_count > 0,.SD[sample(.N, min(10,.N))],by = .(confidence_count,confidence)]
 con <- dbConnect(RMariaDB::MariaDB(), group = "ncats")
