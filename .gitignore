@@ -23,7 +23,9 @@ yarn-debug.log*
 yarn-error.log*
 .Rproj.user
 
+
 # analysis
+analysis/*.log
 *hp_2021*
 *hpo_max_rows*
 *mondo_xref*
