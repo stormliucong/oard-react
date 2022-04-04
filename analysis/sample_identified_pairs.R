@@ -1,6 +1,13 @@
 # Author: Cong Liu
 
-rm(list=ls())
+####################################
+# load concept pair association
+####################################
+source("./generate_pairwise_statistics.R") # only get CUIMC/Notes data to save memory.
+# concept_pair = get(load(file = "./concept_pair.rda"))
+
+concept_pair_stat = concept_pair[dataset_id == 2,.(concept_id_1,concept_id_2,chisquare,odds_ratio,jaccard_index)]
+
 library(dplyr)
 library(data.table)
 library(tidyr)
@@ -10,14 +17,6 @@ library(stringr)
 library(httr)
 library(jsonlite)
 library(ggplot2)
-
-####################################
-# load concept pair association
-####################################
-source("./generate_pairwise_statistics.R") # only get CUIMC/Notes data to save memory.
-# concept_pair = get(load(file = "./concept_pair.rda"))
-
-concept_pair_stat = concept_pair[dataset_id == 2,.(concept_id_1,concept_id_2,chisquare,odds_ratio,jaccard_index)]
 
 ####################################
 # read and process annotation file
@@ -127,5 +126,46 @@ disease_concept_pair_sample = merge(concept_pair_bin_anno_lg_10[stat == "odds_ra
 disease_concept_pair_sample = merge(disease_concept_pair_sample,concept_name,all.y = F,by='concept_id_2')
 disease_concept_pair_sample %>% fwrite(file = "./pair_sample_100_4.csv")
 
+# review results.
+sampled_review = fread("./sampled_pair_review.csv")
+sampled_review = sampled_review %>%  mutate(quantile = case_when(
+  category == 6 ~ "50-60%",
+  category == 7 ~ "60-70%",
+  category == 8 ~ "70-80%",
+  category == 9 ~ "80-90%",
+  category == 10 ~ "90-100%"
+))
+# fig 1
+fig1 = sampled_review[,.(count=.N),by=.(confidence)] %>% 
+  mutate(prop = round(count / sum(count) *100,1)) %>%
+  mutate(ypos = cumsum(prop)+ 0.5*prop) %>%
+  ggplot(aes(x="", y=count, fill=as.factor(confidence))) +
+  geom_bar(stat="identity", width=1) +
+  geom_text(aes(label = prop), position = position_stack(vjust = 0.5), color = "white", size=5) +
+  scale_fill_viridis_d(name="Confidence level",
+                       breaks=c(0,1,2,3),
+                       labels=c("definitely wrong", "likely to be correct", "very likely to be correct", "definitely correct")) + 
+  coord_polar("y", start=0) + 
+  theme_void() # remove background, grid, numeric labels
 
+# fig 2
+mean_score_category = sampled_review[,.(mean_confidecne = mean(confidence)),by=quantile]
+fig2 = mean_score_category %>% ggplot(aes(x = quantile,y = mean_confidecne)) + geom_bar(stat = "identity") + ylab("Mean clinical confidence")
+cor.test(sampled_review$category, sampled_review$confidence, method=c("pearson"))
 
+# fig 3
+sampled_review_stat = merge(sampled_review,concept_pair_stat)
+fig3 = sampled_review_stat %>% ggplot(aes(x = as.factor(confidence),fill = as.factor(confidence), y = odds_ratio)) + geom_boxplot() +
+  ylab("log odds ratio") + 
+  xlab("") + theme(axis.text.x = element_blank(), legend.position = "none") + 
+  scale_fill_viridis_d(name="Confidence level",
+                       breaks=c(0,1,2,3),
+                       labels=c("definitely wrong", "likely to be correct", "very likely to be correct", "definitely correct"))
+
+# grid
+require(gridExtra)
+lay <- rbind(c(1,1,3),c(2,2,2))
+fig1 = fig1 + labs(title = "(A)") + theme(plot.title = element_text(hjust = 0.5))  
+fig2 = fig2 + labs(title = "(B)")+ theme(plot.title = element_text(hjust = 0.5)) 
+fig3 = fig3 + labs(title = "(C)" )+ theme(plot.title = element_text(hjust = 0.5)) 
+grid.arrange(fig1, fig2, fig3,layout_matrix = lay)
