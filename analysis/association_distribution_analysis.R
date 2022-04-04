@@ -92,13 +92,14 @@ figa = dist6a %>%
   labs(title = "(A)") +
   ylab("") + 
   xlab("") + 
+  scale_color_viridis_d() +
   labs(color='Annotation Status') +
   theme(plot.title = element_text(hjust = 0.5), legend.position = "right",axis.text.x = element_blank())
 
 ##################
 # fig 6b p-value rank
 ##################
-concept_pair_full_stat = merge(concept_pair_anno[Source=='Curated in database'][,.(.N),by=.(concept_id_1,concept_id_2)],concept_pair_stat,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
+concept_pair_full_stat = merge(concept_pair_anno[Source=='Curated in database' | Source=='Identified in literature'][,.(.N),by=.(concept_id_1,concept_id_2)],concept_pair_stat,by = c("concept_id_1","concept_id_2"),all.x = F,all.y = T)
 concept_pair_anno_dist = concept_pair_full_stat[!is.na(N)]
 concept_pair_anno_dist[,distribution := "annotated"]
 concept_pair_nonanno_dist = concept_pair_full_stat[is.na(N) & concept_id_2 %in% unique(concept_pair_anno_dist$concept_id_2) & concept_id_1 < 90000000]
@@ -123,13 +124,15 @@ figb = wilcox_p %>%
   facet_wrap(~stat, scales = "free") + 
   labs(title = "(B)") +
   xlab("") + 
+  scale_color_viridis_d() +
   theme(plot.title = element_text(hjust = 0.5), legend.position = "none")
 
+wilcox_p[,.(sum(p < 0.05)/length(p)),by=stat]
 ##################
 # fig 6c delta value by Evidence
 ##################
 
-dist6b = merge(concept_pair_dist,concept_pair_anno[Source=='Curated in database'][,.(concept_id_1,concept_id_2,Evidence)],all.x = T)
+dist6b = merge(concept_pair_dist,concept_pair_anno[Source=='Curated in database' | Source=='Identified in literature'][,.(concept_id_1,concept_id_2,Evidence)],all.x = T)
 dist6b_annotated = dist6b[!is.na(Evidence)]
 dist6b_annotated = dist6b_annotated %>% group_by(concept_id_2,Evidence) %>%
   summarise(chisquare_m = median(log(chisquare)),odds_ratio_m = median(odds_ratio),jaccard_index_m = median(log(jaccard_index)) ) %>%
@@ -158,6 +161,7 @@ figc = dist6b %>%
   facet_wrap(~stat, scales = "free") + 
   labs(title = "(C)") +
   xlab("") + 
+  scale_color_viridis_d() +
   theme(plot.title = element_text(hjust = 0.5), legend.position = "right")
 
 ##################
@@ -165,7 +169,7 @@ figc = dist6b %>%
 ##################
 
 
-dist6c = merge(concept_pair_dist,concept_pair_anno[Source=='Curated in database'][,.(concept_id_1,concept_id_2,Frequency)],all.x = T)
+dist6c = merge(concept_pair_dist,concept_pair_anno[Source=='Curated in database' | Source=='Identified in literature'][,.(concept_id_1,concept_id_2,Frequency)],all.x = T)
 dist6c_annotated = dist6c[Frequency %in% c("HP:0040284", "HP:0040282", "HP:0040281", "HP:0040283")]
 dist6c_annotated = dist6c_annotated %>% group_by(concept_id_2,Frequency) %>%
   summarise(chisquare_m = median(log(chisquare)),odds_ratio_m = median(odds_ratio),jaccard_index_m = median(log(jaccard_index)) ) %>%
@@ -193,6 +197,7 @@ figd = dist6c %>%
   facet_wrap(~stat, scales = "free") + 
   labs(title = "(D)") +
   xlab("") + 
+  scale_color_viridis_d() +
   theme(plot.title = element_text(hjust = 0.5), legend.position = "right")
 
 
