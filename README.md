@@ -20,6 +20,7 @@ I followed this [article](https://blog.miguelgrinberg.com/post/how-to-deploy-a-r
 You need to install three packages on your machine:
 * [Npm](https://docs.npmjs.com/) : The package manager for the Node JavaScript platform. 
 * [Node.js](https://nodejs.org/en/): The JavaScript runtime that you will use to run your frontend project.
+* You’ll need to have Node >= 14.0.0 and npm >= 5.6 on your machine.
 * [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable): A package and project manager for Node.js applications.
 
 ### 2. Installation on Ubuntu
