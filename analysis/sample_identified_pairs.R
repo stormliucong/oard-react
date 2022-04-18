@@ -126,7 +126,7 @@ disease_concept_pair_sample = merge(concept_pair_bin_anno_lg_10[stat == "odds_ra
 disease_concept_pair_sample = merge(disease_concept_pair_sample,concept_name,all.y = F,by='concept_id_2')
 disease_concept_pair_sample %>% fwrite(file = "./pair_sample_100_4.csv")
 
-# review results.
+#### review results.####
 sampled_review = fread("./sampled_pair_review.csv")
 sampled_review = sampled_review %>%  mutate(quantile = case_when(
   category == 6 ~ "50-60%",
@@ -155,6 +155,8 @@ cor.test(sampled_review$category, sampled_review$confidence, method=c("pearson")
 
 # fig 3
 sampled_review_stat = merge(sampled_review,concept_pair_stat)
+cor.test(sampled_review_stat$confidence, sampled_review_stat$odds_ratio, method=c("pearson"))
+
 fig3 = sampled_review_stat %>% ggplot(aes(x = as.factor(confidence),fill = as.factor(confidence), y = odds_ratio)) + geom_boxplot() +
   ylab("log odds ratio") + 
   xlab("") + theme(axis.text.x = element_blank(), legend.position = "none") + 
@@ -162,6 +164,10 @@ fig3 = sampled_review_stat %>% ggplot(aes(x = as.factor(confidence),fill = as.fa
                        breaks=c(0,1,2,3),
                        labels=c("definitely wrong", "likely to be correct", "very likely to be correct", "definitely correct"))
 
+sampled_review_stat %>% filter(odds_ratio > 5) %>% 
+  group_by(confidence) %>% 
+  summarise(count = length(odds_ratio)) %>%
+  mutate(prop = round(count / sum(count) *100,1))
 # grid
 require(gridExtra)
 lay <- rbind(c(1,1,3),c(2,2,2))
