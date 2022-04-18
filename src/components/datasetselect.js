@@ -30,10 +30,12 @@ class DsSelectComp extends Component {
     columns:
       [
         { field: "id", hide: true },
-        { field: "dataset_id", headerName: "dataset_id", width: 100 },
-        { field: "clinical_site", headerName: "clinical_site", width: 150 },
-        { field: "source", headerName: "source", width: 150 },
-        { field: "subclass_category", headerName: "subclass_category", width: 150 },
+        { field: "short_name", headName: "dataset_name", hide: true},
+        { field: "dataset_id", headerName: "dataset_id", width:100},
+        { field: "clinical_site", headerName: "clinical_site", width: 100 },
+        { field: "source", headerName: "source", width: 100 },
+        { field: "subpopulation", headerName: "subpopulation", width: 150 },
+        { field: "subclass_category", headerName: "subclass_category", width: 300 },
       ]
   }
   
@@ -60,10 +62,12 @@ class DsSelectComp extends Component {
             rows: csvRow.map((row, i) => {
               return {
                 "id": i,
+                "short_name": row[0] + '-' + row[4] + ' (' + row[1] + '/' + row[2] + ')',
                 "dataset_id": row[0],
                 "clinical_site": row[1],
                 "source": row[2],
-                "subclass_category": row[3]
+                "subpopulation": row[3],
+                "subclass_category": row[4]
               }
             }
             )
@@ -118,7 +122,7 @@ class DsSelectComp extends Component {
             {
                 this.state.rows && 
                 this.state.rows.map((row, i) =>
-                    <MenuItem key={i} value={row.dataset_id}>{row.dataset_id}</MenuItem>
+                    <MenuItem key={i} value={row.dataset_id}>{row.short_name}</MenuItem>
                 )
                 
 

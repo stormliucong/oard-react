@@ -6,25 +6,19 @@ import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import Container from '@mui/material/Container';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import List from '@mui/material/List';
 import ListSubheader from '@mui/material/ListSubheader';
 import Button from '@mui/material/Button';
 import SinelgResultDisplayComp from './singleresult'
-import DsHelperComp from './datasethelper'
 import DsSelectComp from './datasetselect'
+import DomainSelectComp from './domainselect'
+import ReturnSelectComp from './returnselect'
+import ServiceSelectComp from './serviceselect'
+import MethodSelectComp from './methodselect'
+
 import Grid from '@mui/material/Grid';
-import InfoIcon from '@mui/icons-material/Info';
-import IconButton from '@mui/material/IconButton';
-import Modal from '@mui/material/Modal';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import CloseIcon from '@mui/icons-material/Close';
 
 
 
@@ -219,6 +213,22 @@ class MainComp extends Component {
         this.setState({dataset: ds})
     }
 
+    handleDomainSelectChange = (domain) => {
+        this.setState({domain: domain})
+    }
+
+    handleReturnSelectChange = (topN) => {
+        this.setState({topN: topN})
+    }
+
+    handleServiceSelectChange = (service) => {
+        this.setState({apiService: service})  
+    }
+
+    handleMethodSelectChange = (method) => {
+        this.setState({apiMethod: method})  
+    }
+
     loadConcepts = async () => {
         const query = this.state.queryText
         console.log(query)
@@ -305,44 +315,6 @@ class MainComp extends Component {
 
     render() {
 
-
-        if (this.state.apiService == 'frequencies') {
-            var methodSelectOption =
-                <Select
-                    value={this.state.apiMethod}
-                    label="method"
-                    onChange={(event) => this.setState({ apiMethod: event.target.value })
-                    }
-                >
-
-                    <MenuItem sx={{ display: (this.state.queryConceptList1.length && !this.state.queryConceptList2.length) ? "block" : "none" }}
-                        value="singleConceptFreq">singleConceptFreq</MenuItem>
-                    <MenuItem sx={{ display: (this.state.queryConceptList1.length && this.state.queryConceptList2.length) ? "block" : "none" }}
-                        value="pairedConceptFreq">pairedConceptFreq</MenuItem>
-                    <MenuItem sx={{ display: (this.state.queryConceptList1.length <= 1 && !this.state.queryConceptList2.length) ? "block" : "none" }}
-                        value="mostFrequency">mostFrequency</MenuItem>
-                </Select>;
-
-        } else {
-            var methodSelectOption =
-                <Select
-                    value={this.state.apiMethod}
-                    label="method"
-                    onChange={(event) => {
-                        this.setState({ apiMethod: event.target.value });
-                        // if(this.state.apiMethod !== ''){
-                        //     this.handleSubmit()
-                        // }
-                    }
-                    }
-                >
-                    <MenuItem value="chiSquare">chiSquare</MenuItem>
-                    <MenuItem value="obsExpRatio">obsExpRatio</MenuItem>
-                    <MenuItem value="relativeFrequency">relativeFrequency</MenuItem>
-                    <MenuItem value="jaccardIndex">jaccardIndex</MenuItem>
-                </Select>;
-        }
-
         return (
             <Grid container xs={12} spacing={2} justifyContent="center" p={10}>
 
@@ -393,7 +365,7 @@ class MainComp extends Component {
                                 <TextField
                                     {...params}
                                     variant="standard"
-                                    label="Query Concept List 1"
+                                    label="Query Concept List 1 (Leave blank for most frequent single concept)"
                                     placeholder="add more"
                                 />
                             )}
@@ -444,7 +416,7 @@ class MainComp extends Component {
                                 <TextField
                                     {...params}
                                     variant="standard"
-                                    label="Query Concept List 2"
+                                    label="Query Concept List 2 (Leave blank for most associated/co-occurred with concept 1)"
                                     placeholder="add more"
                                 />
                             )}
@@ -458,67 +430,23 @@ class MainComp extends Component {
 
                     {/* domain selection */}
                     <Grid item xs={12} md={6} lg={2}>
-                        <FormControl sx={{ display: 'flex' }}>
-                            <InputLabel>Domain</InputLabel>
-                            <Select
-                                value={this.state.domain}
-                                label="Domain"
-                                onChange={(event) => this.setState({ domain: event.target.value })
-                                }
-                            >
-                                <MenuItem value="all">All</MenuItem>
-                                <MenuItem value="phenotypes">Phenotypes/HPO</MenuItem>
-                                <MenuItem value="diseases">Diseases/Mondo</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <DomainSelectComp handleDomainSelectChange={this.handleDomainSelectChange} />
                     </Grid>
 
                     {/* return selection */}
                     <Grid item xs={12} md={6} lg={2}>
-                        <FormControl sx={{ display: 'flex' }}>
-
-                            <InputLabel>Return </InputLabel>
-                            <Select
-                                value={this.state.topN}
-                                label="Top N"
-                                onChange={(event) => this.setState({ topN: event.target.value })
-                                }
-                            >
-                                <MenuItem value="10">10</MenuItem>
-                                <MenuItem value="25">25</MenuItem>
-                                <MenuItem value="50">50</MenuItem>
-                                <MenuItem value="100">100</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <ReturnSelectComp handleReturnSelectChange={this.handleReturnSelectChange} />
                     </Grid>
 
                     {/* service selection */}
                     <Grid item xs={12} md={6} lg={2}>
-                        <FormControl sx={{ display: 'flex' }}>
-                            <InputLabel>Service</InputLabel>
-                            <Select
-                                value={this.state.queryConceptList1.length ? this.state.apiService : "frequencies"}
-                                label="service"
-                                onChange={(event) => this.setState({
-                                    apiService: event.target.value,
-                                    apiMethod: event.target.value == 'frequencies' ? 'mostFrequency' : 'jaccardIndex'
-                                })
-                                }
-                            >
-                                <MenuItem value="frequencies">frequencies</MenuItem>
-                                <MenuItem value="association" sx={{
-                                    display: this.state.queryConceptList1.length ? "inline" : "none"
-                                }}>association</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <ServiceSelectComp handleServiceSelectChange={this.handleServiceSelectChange} queryConceptList1={this.state.queryConceptList1}/>
                     </Grid>
 
                     {/* method selection */}
                     <Grid item xs={12} md={6} lg={2}>
-                        <FormControl sx={{ display: 'flex' }}>
-                            <InputLabel>Method</InputLabel>
-                            {methodSelectOption}
-                        </FormControl>
+                        <MethodSelectComp handleMethodSelectChange={this.handleMethodSelectChange} apiService={this.state.apiService} queryConceptList1={this.state.queryConceptList1} queryConceptList2={this.state.queryConceptList2}/>
+                        
                     </Grid>
 
                     {/* submit button */}

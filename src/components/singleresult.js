@@ -29,21 +29,21 @@ class SinelgResultDisplayComp extends Component {
             switch (this.props.method) {
                 case 'chiSquare':
                     console.log('negative 1');
-                    sencondaryName = 'Chi-square: ' + this.props.result.ws_cs
+                    sencondaryName = 'Chi-square: ' + Math.round(this.props.result.ws_cs * 1000) / 1000                    
                     thirdName = ''
                     break;
                 case 'obsExpRatio': // foo is 0 so criteria met here so this block will run
                     console.log(0);
-                    sencondaryName = 'LnRatio: ' + this.props.result.ws_ln_ratio
+                    sencondaryName = 'LnRatio: ' + Math.round(this.props.result.ws_ln_ratio * 1000) / 1000
                     break;
                 // NOTE: the forgotten break would have been here
                 case 'relativeFrequency': // no break statement in 'case 0:' so this case will run as well
                     console.log(1);
-                    sencondaryName = 'Relative frequency: ' + this.props.result.ws_relative_frequency
+                    sencondaryName = 'Relative frequency: ' + Math.round(this.props.result.ws_relative_frequency * 1000) / 1000
                     break; // it encounters this break so will not continue into 'case 2:'
                 case 'jaccardIndex':
                     console.log(2);
-                    sencondaryName = 'Jaccard Index: ' + this.props.result.ws_jaccard_index
+                    sencondaryName = 'Jaccard Index: ' + Math.round(this.props.result.ws_jaccard_index * 1000) / 1000
                     break;
                 default:
                     console.log('default');
@@ -70,7 +70,7 @@ class SinelgResultDisplayComp extends Component {
                                         </ListItemIcon>
                                         <ListItemText primary={detail.concept_name_1} secondary={
                                             'Pair Count: '+ detail.concept_pair_count + 
-                                            '; Query weight: ' + detail.w}/>
+                                            '; Query weight: ' + Math.round(detail.w * 1000) / 1000}/>
                                         </ListItemButton>
                                     </React.Fragment>
                                 )            
@@ -105,7 +105,7 @@ class SinelgResultDisplayComp extends Component {
             }
             if(isPairFreq){
                 primaryName = this.props.result.concept_name_1 + ' (' + this.props.result.concept_code_1 + ')' + '---' + this.props.result.concept_name_2 + ' (' + this.props.result.concept_code_2 + ')'
-                sencondaryName = 'Concept Pair Frequency: ' + this.props.result.concept_frequency + ' (' + this.props.result.concept_pair_count + ')'
+                sencondaryName = 'Concept Pair Frequency: ' + Math.round(this.props.result.concept_frequency * 1000) / 1000 + ' (' + this.props.result.concept_pair_count + ')'
                 return (
                     <React.Fragment>
                         <Divider />
@@ -143,7 +143,7 @@ class SinelgResultDisplayComp extends Component {
             }
             else{
                 primaryName = this.props.result.concept_name + ' (' + this.props.result.concept_code + ')'
-                sencondaryName = 'Concept Frequency: ' + this.props.result.concept_frequency + ' (' + this.props.result.concept_count + ')'
+                sencondaryName = 'Concept Frequency: ' + Math.round(this.props.result.concept_frequency * 1000) / 1000 + ' (' + this.props.result.concept_count + ')'
                 return (
                     <React.Fragment>
                         <Divider />
