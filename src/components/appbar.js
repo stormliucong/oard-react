@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 
 const pages = [
-    {'name': 'API','href': 'https://smart-api.info/ui/aed21cd6828e18de3fa2da6a76574520'},
+    {'name': 'API','href': 'https://rare.cohd.io/api'},
     {'name': 'GitHub', 'href': 'https://github.com/stormliucong/oard-react'},
     {'name': 'About', 'href': 'https://github.com/stormliucong/oard-react'},
     {'name': 'COHD', 'href': 'https://cohd.io/'},

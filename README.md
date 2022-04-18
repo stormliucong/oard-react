@@ -9,7 +9,7 @@ This is a React web app to serve the web app of OARD. The backend is provided by
 
 ## How to use OARD
 - [Use web app](./tutorial)
-- [Use API ](https://smart-api.info/ui/aed21cd6828e18de3fa2da6a76574520)
+- [Use API ](https://rare.cohd.io/api)
 
 
 
