@@ -13,6 +13,7 @@ import ServiceSelectComp from './serviceselect'
 import MethodSelectComp from './methodselect'
 import SearchBox1Comp from './searchbox1';
 import SearchBox2Comp from './searchbox2';
+import SubmitComp from "./submit";
 
 import Grid from '@mui/material/Grid';
 
@@ -30,8 +31,6 @@ class MainComp extends Component {
         apiResultsDisplayService: "frequencies",
         apiResultsDisplayMethod: "mostFrequency",
         apiResultsDisplay: false,
-        submitError: false,
-        submitHelperText: '',
         apiResults: [
             {
                 "concept_code_2": "MONDO:0020128",
@@ -170,74 +169,11 @@ class MainComp extends Component {
         this.setState({apiMethod: method})  
     }
 
-    handleSubmit = async () => {
-        var conceptIdList1 = []
-        var conceptIdList2 = []
-        console.log(this.state.apiMethod)
-        // this.setState({
-        //     submitHelperText: this.state.apiMethod === '' ? 'No method provided!' : '',
-        //     submitError: this.state.apiMethod === '' ? true : false
-        // })
-        if (this.state.queryConceptList1.length && !this.state.submitError) {
-            const queryList1 = this.state.queryConceptList1.map((concept) => concept.id)
-            var response1 = await axios.get('https://rare.cohd.io//api/vocabulary/findConceptByCode', {
-                params: {
-                    q: queryList1.join(';'),
-                }
-            });
-            conceptIdList1 = response1.data.results.map((result) => result.concept_id)
-            this.setState({
-                submitHelperText: conceptIdList1.length ? '' : 'No concept found in OARD database for query concept 1!',
-                submitError: conceptIdList1.length ? false : true
-            })
-        }
-        if (this.state.queryConceptList2.length && !this.state.submitError) {
-            const queryList2 = this.state.queryConceptList2.map((concept) => concept.id)
-            var response2 = await axios.get('https://rare.cohd.io//api/vocabulary/findConceptByCode', {
-                params: {
-                    q: queryList2.join(';'),
-                }
-            });
-            conceptIdList2 = response2.data.results.map((result) => result.concept_id)
-            this.setState({
-                submitHelperText: conceptIdList2.length ? '' : 'No concept found in OARD database for query concept 2!',
-                submitError: conceptIdList2.length ? false : true
-            })
-        }
-
-        if (!this.state.submitError) {
-            if (this.state.domain === 'all') {
-                var response = await axios.get('https://rare.cohd.io//api/' + this.state.apiService + '/' + this.state.apiMethod, {
-                    params: {
-                        dataset_id: parseInt(this.state.dataset),
-                        concept: conceptIdList1.join(';'),
-                        concept_id: conceptIdList1.join(';'),
-                        concept_id_1: conceptIdList1.join(';'),
-                        concept_id_2: conceptIdList2.join(';'),
-                        top_n: parseInt(this.state.topN)
-                    }
-                });
-            } else {
-                var response = await axios.get('https://rare.cohd.io//api/' + this.state.apiService + '/' + this.state.apiMethod, {
-                    params: {
-                        dataset_id: parseInt(this.state.dataset),
-                        concept: conceptIdList1.join(';'),
-                        concept_id: conceptIdList1.join(';'),
-                        concept_id_1: conceptIdList1.join(';'),
-                        concept_id_2: conceptIdList2.join(';'),
-                        top_n: parseInt(this.state.topN),
-                        domain_id: this.state.domain
-                    }
-                });
-            }
-
-            this.setState({
-                apiResults: response.data.results,
-                apiResultsDisplayService: this.state.apiService,
-                apiResultsDisplayMethod: this.state.apiMethod,
-                apiResultsDisplay: true
-            })
-        }
+    handleSubmitChange = (results) => {
+        this.setState({
+            apiResults: results, 
+            apiResultsDisplay: true
+        })
     }
 
 
@@ -273,12 +209,7 @@ class MainComp extends Component {
                     <ReturnSelectComp handleReturnSelectChange={this.handleReturnSelectChange} topN={this.state.topN} apiMethod={this.state.apiMethod} queryConceptList2={this.state.queryConceptList2} />
 
                     {/* submit button */}
-                    <Grid item container xs={12} md={6} lg={2} justifyContent="center">
-                        <FormControl error={this.state.submitError} sx={{ display: 'flex' }}>
-                            <Button variant="contained" onClick={this.handleSubmit} size="large">Submit</Button>
-                            <FormHelperText>{this.state.submitHelperText}</FormHelperText>
-                        </FormControl>
-                    </Grid>
+                    <SubmitComp handleSubmitChange={this.handleSubmitChange} dataset={this.state.dataset} domain={this.state.domain} topN={this.state.topN} apiService={this.state.apiService} apiMethod={this.state.apiMethod} queryConceptList1={this.state.queryConceptList1} queryConceptList2={this.state.queryConceptList2}/>
                 </Grid>
 
                 {/* results */}
