@@ -1,11 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import List from '@mui/material/List';
@@ -17,6 +11,8 @@ import DomainSelectComp from './domainselect'
 import ReturnSelectComp from './returnselect'
 import ServiceSelectComp from './serviceselect'
 import MethodSelectComp from './methodselect'
+import SearchBox1Comp from './searchbox1';
+import SearchBox2Comp from './searchbox2';
 
 import Grid from '@mui/material/Grid';
 
@@ -24,27 +20,8 @@ import Grid from '@mui/material/Grid';
 
 class MainComp extends Component {
     state = {
-        queryText: '',
-        querySugList: [
-            {
-                "name": "Abnormality of the musculature",
-                "id": "HP:0003011",
-                "group": "HPO PHENOTYPE"
-            },
-            {
-                "name": "Muscle weakness",
-                "id": "HP:0001324",
-                "group": "HPO PHENOTYPE"
-
-            },
-            {
-                "name": "Skeletal muscle atrophy",
-                "id": "HP:0003202",
-                "group": "HPO PHENOTYPE"
-            }],
         queryConceptList1: [],
         queryConceptList2: [],
-        dtHelperOpen: false,
         dataset: "1",
         domain: "phenotypes",
         topN: "25",
@@ -52,7 +29,6 @@ class MainComp extends Component {
         apiMethod: "mostFrequency",
         apiResultsDisplayService: "frequencies",
         apiResultsDisplayMethod: "mostFrequency",
-        apiSelectableMethod: ['singleConceptFreq', 'pairedConceptFreq', 'mostFrequency'],
         apiResultsDisplay: false,
         submitError: false,
         submitHelperText: '',
@@ -140,73 +116,15 @@ class MainComp extends Component {
     }
 
 
-    loadConceptsEbi = async (q) => {
-        const query = q
-        console.log(query)
-        var response = await axios.get('https://www.ebi.ac.uk/ols/api/select', {
-            params: {
-                q: query,
-                rows: 50,
-                ontology: 'hp,omim,mondo,ordo'
-            }
-        });
-        // this.setState({ querySugList: [] })
-        var resultList = response.data.response.docs
-        console.log(resultList)
-        var terms = []
-        var idCheck = {}
-        if (resultList.length > 0) {
-            resultList.forEach((doc) => {
-                // console.log(doc)
-                if(doc.obo_id  !== undefined){
-                    if (doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:') || doc.obo_id.startsWith('Orphanet:') || doc.obo_id.startsWith('OMIM:')) {
-                        
-                        // term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE' : 'HPO Phenotype'
-                        var label = doc.label
-                        var id = doc.obo_id
-                        if(idCheck[id] === undefined){
-                            idCheck[id] = 1
-                            terms.push({"id": id, "name": label})
-                        }
-                    }
-                }
-                
-            });
+    handleSearchBox1SelectChange = (newValue) => {
+        this.setState({ queryConceptList1: [...newValue] })
+        if (!this.state.queryConceptList1){
+            this.setState({queryConceptList2: [], apiService: "frequencies", apiMethod: "mostFrequency"})
         }
-        // var list = this.processResponseEbi(response)
-        console.log(terms)
-        this.setState({ querySugList: terms })
-        console.log(this.state.querySugList)
-
     }
 
-    processResponse = (response) => {
-        return response.data.terms
-    }
-
-    processResponseEbi = (response) => {
-        var resultList = response.data.response.docs
-        var terms = []
-        var idCheck = {}
-        if (resultList.length > 0) {
-            resultList.forEach((doc) => {
-                // console.log(doc)
-                if(doc.obo_id  !== undefined){
-                    if (doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:')) {
-                        
-                        // term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE' : 'HPO Phenotype'
-                        var label = doc.label
-                        var id = doc.obo_id
-                        if(idCheck[id] === undefined){
-                            idCheck[id] = 1
-                            terms.push({"id": id, "name": label})
-                        }
-                    }
-                }
-                
-            });
-        }
-        return terms
+    handleSearchBox2SelectChange = (newValue) =>{
+        this.setState({ queryConceptList2: [...newValue] })
     }
 
     handleDatasetSelectChange = (ds) => {
@@ -227,19 +145,6 @@ class MainComp extends Component {
 
     handleMethodSelectChange = (method) => {
         this.setState({apiMethod: method})  
-    }
-
-    loadConcepts = async () => {
-        const query = this.state.queryText
-        console.log(query)
-        var response = await axios.get('https://hpo.jax.org/api/hpo/search', {
-            params: {
-                q: query,
-            }
-        });
-        var list = this.processResponse(response)
-        console.log(list)
-        this.setState({ querySugList: list })
     }
 
     handleSubmit = async () => {
@@ -321,106 +226,14 @@ class MainComp extends Component {
                 {/* form */}
                 <Grid container item xs={12} spacing={5}  justifyContent="space-around">
                     {/* search box 1 */}
+                    
                     <Grid item xs={12} lg={6} >
-                        <Autocomplete
-                        sx={{ display: 'flex' }}
-                            disablePortal
-                            multiple
-                            id="combo-box-demo"
-                            getOptionLabel={(option) => option.name + " [" + option.id + "]"}
-                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                            options={this.state.querySugList}
-                            filterOptions={(x) => x}
-                            //user input in the box
-                            onInputChange={(event, newInputValue) => {
-                                this.setState({ queryText: newInputValue })
-                                if (newInputValue.length > 2) {
-                                    this.loadConceptsEbi(newInputValue)
-                                }
-                            }}
-                            // user select from suggestion list
-                            onChange={(event, newValue) => {
-                                const concept = newValue
-                                this.setState({ queryConceptList1: [...newValue] })
-                                // console.log(this.state.conceptList)
-                            }}
-                            renderOption={(props, option) => (
-                                <Box component="li" {...props}>
-                                    <Box sx={{
-                                        border: 0,
-                                        fontSize: 'smaller'
-                                    }}> {option.name} </Box>
-                                    <Box sx={{
-                                        border: 0,
-                                        fontWeight: 'light',
-                                        textAlign: 'left',
-                                        fontStyle: 'oblique',
-                                        color: 'grey',
-                                        m: 2,
-                                        fontSize: 'smaller'
-                                    }}>{option.id}</Box>
-                                </Box>
-                            )}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    variant="standard"
-                                    label="Query Concept List 1 (Leave blank for most frequent single concept)"
-                                    placeholder="add more"
-                                />
-                            )}
-                        />
+                        <SearchBox1Comp handleSearchBox1SelectChange={this.handleSearchBox1SelectChange} />
                     </Grid>
 
                     {/* search box 2 */}
                     <Grid item xs={12} lg={6}>
-                        <Autocomplete
-                        sx={{ display: 'flex' }}
-                            disablePortal
-                            multiple
-                            id="combo-box-demo"
-                            getOptionLabel={(option) => option.name + " [" + option.id + "]"}
-                            options={this.state.querySugList}
-                            filterOptions={(x) => x}
-                            //user input in the box
-                            onInputChange={(event, newInputValue) => {
-                                this.setState({ queryText: newInputValue })
-                                if (newInputValue.length > 2) {
-                                    this.loadConceptsEbi(newInputValue)
-                                }
-                            }}
-                            // user select from suggestion list
-                            onChange={(event, newValue) => {
-                                const concept = newValue
-                                this.setState({ queryConceptList2: [...newValue] })
-                                // console.log(this.state.conceptList)
-                            }}
-                            renderOption={(props, option) => (
-                                <Box component="li" {...props}>
-                                    <Box sx={{
-                                        border: 0,
-                                        fontSize: 'smaller'
-                                    }}> {option.name}</Box>
-                                    <Box sx={{
-                                        border: 0,
-                                        fontWeight: 'light',
-                                        textAlign: 'left',
-                                        fontStyle: 'oblique',
-                                        color: 'grey',
-                                        m: 2,
-                                        fontSize: 'smaller'
-                                    }}>{option.id}</Box>
-                                </Box>
-                            )}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    variant="standard"
-                                    label="Query Concept List 2 (Leave blank for most associated/co-occurred with concept 1)"
-                                    placeholder="add more"
-                                />
-                            )}
-                        />
+                        <SearchBox2Comp handleSearchBox2SelectChange={this.handleSearchBox2SelectChange} queryConceptList1={this.state.conceptList1} />
                     </Grid>
 
                     {/* dataset selection */}
@@ -430,7 +243,7 @@ class MainComp extends Component {
 
                     {/* domain selection */}
                     <Grid item xs={12} md={6} lg={2}>
-                        <DomainSelectComp handleDomainSelectChange={this.handleDomainSelectChange} />
+                        <DomainSelectComp handleDomainSelectChange={this.handleDomainSelectChange} queryConceptList1={this.state.queryConceptList1} queryConceptList2={this.state.queryConceptList2} />
                     </Grid>
 
                     {/* return selection */}

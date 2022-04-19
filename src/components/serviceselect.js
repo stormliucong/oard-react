@@ -14,7 +14,7 @@ class ServiceSelectComp extends Component {
 
     state = {
         serviceHelperOpen: false,
-        apiService: "association",
+        apiService: "frequencies",
         rows:
             [
                 { id: 1, service: 'frequencies', desc: 'return absoulte count and frequencies.' },
@@ -40,7 +40,6 @@ class ServiceSelectComp extends Component {
     }
 
     render() {
-
         return (
             <FormControl sx={{ display: 'flex' }}>
                 <InputLabel>Service<InfoIcon onClick={this.handleServiceHelperOpen}></InfoIcon></InputLabel>

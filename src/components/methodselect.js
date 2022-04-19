@@ -14,7 +14,7 @@ class MethodSelectComp extends Component {
 
     state = {
         methodHelperOpen: false,
-        apiMethod: "association",
+        apiMethod: "mostFrequency",
         rows:
             [
                 { id: 1, service: 'frequencies', desc: 'return absoulte count and frequencies.' },
@@ -72,7 +72,7 @@ class MethodSelectComp extends Component {
 
         return (
             <FormControl sx={{ display: 'flex' }}>
-                <InputLabel>Service<InfoIcon onClick={this.handleMethodHelperOpen}></InfoIcon></InputLabel>
+                <InputLabel>method<InfoIcon onClick={this.handleMethodHelperOpen}></InfoIcon></InputLabel>
                 <Dialog
                     fullWidth={true}
                     open={this.state.methodHelperOpen}

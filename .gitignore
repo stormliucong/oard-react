@@ -35,3 +35,4 @@ analysis/*.log
 *Rhistory*
 *pdf*
 *.Renviron*
+.vscode*
