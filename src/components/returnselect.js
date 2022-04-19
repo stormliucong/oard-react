@@ -32,7 +32,7 @@ class ReturnSelectComp extends Component {
         return (
             <Grid item xs={12} md={6} lg={2}>
                 <FormControl sx={{ display: 'flex' }} disabled={this.props.queryConceptList2.length != 0 || this.props.apiMethod == "singleConceptFreq" ? true : false}>
-                    <InputLabel>Return<InfoIcon onClick={this.handleReturnHelperOpen}></InfoIcon></InputLabel>
+                    <InputLabel>Return</InputLabel>
                     <Dialog
                         fullWidth={true}
                         open={this.state.returnHelperOpen}
