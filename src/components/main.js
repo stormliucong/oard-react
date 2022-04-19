@@ -14,6 +14,7 @@ import MethodSelectComp from './methodselect'
 import SearchBox1Comp from './searchbox1';
 import SearchBox2Comp from './searchbox2';
 import SubmitComp from "./submit";
+import ResultComp from "./results";
 
 import Grid from '@mui/material/Grid';
 
@@ -28,8 +29,6 @@ class MainComp extends Component {
         topN: "25",
         apiService: "frequencies",
         apiMethod: "mostFrequency",
-        apiResultsDisplayService: "frequencies",
-        apiResultsDisplayMethod: "mostFrequency",
         apiResultsDisplay: false,
         apiResults: [
             {
@@ -118,10 +117,10 @@ class MainComp extends Component {
     handleSearchBox1SelectChange = (newValue) => {
         if(!newValue.length){
             //reset
-            this.setState({ queryConceptList1: [], queryConceptList2: [], apiService: "frequencies", apiMethod: "mostFrequency", topN: "25"})
+            this.setState({ queryConceptList1: [], queryConceptList2: [], apiService: "frequencies", apiMethod: "mostFrequency", topN: "25", apiResultsDisplay: false})
         }else{
             if(this.state.apiMethod == 'mostFrequency'){
-                this.setState({ queryConceptList1: [...newValue], queryConceptList2: [], apiService: "frequencies", apiMethod: "singleConceptFreq"})
+                this.setState({ queryConceptList1: [...newValue], queryConceptList2: [], apiService: "frequencies", apiMethod: "singleConceptFreq", apiResultsDisplay: false})
             }else{
                 this.setState({queryConceptList1: [...newValue]})
             }
@@ -132,41 +131,41 @@ class MainComp extends Component {
     handleSearchBox2SelectChange = (newValue) =>{
         if(this.state.apiService == "frequencies"){
             if(!newValue.length){
-                this.setState({queryConceptList2: [], apiMethod: "singleConceptFreq"})
+                this.setState({queryConceptList2: [], apiMethod: "singleConceptFreq", apiResultsDisplay: false})
             }else{
-                this.setState({queryConceptList2: [...newValue], apiMethod: "pairedConceptFreq"})
+                this.setState({queryConceptList2: [...newValue], apiMethod: "pairedConceptFreq", apiResultsDisplay: false})
             }
         }else{
-            this.setState({queryConceptList2: [...newValue]})
+            this.setState({queryConceptList2: [...newValue], apiResultsDisplay: false})
         }
     }
 
     handleDatasetSelectChange = (ds) => {
-        this.setState({dataset: ds})
+        this.setState({dataset: ds, apiResultsDisplay: false})
     }
 
     handleDomainSelectChange = (domain) => {
-        this.setState({domain: domain})
+        this.setState({domain: domain, apiResultsDisplay: false})
     }
 
     handleReturnSelectChange = (topN) => {
-        this.setState({topN: topN})
+        this.setState({topN: topN, apiResultsDisplay: false})
     }
 
     handleServiceSelectChange = (service) => {
         if (service == "frequencies" ){
             if(!this.state.queryConceptList2.length){
-                this.setState({apiService: "frequencies", apiMethod: "singleConceptFreq"})
+                this.setState({apiService: "frequencies", apiMethod: "singleConceptFreq", apiResultsDisplay: false})
             }else{
-                this.setState({apiService: "frequencies", apiMethod: "pairedConceptFreq"})
+                this.setState({apiService: "frequencies", apiMethod: "pairedConceptFreq", apiResultsDisplay: false})
             }
         }else{
-            this.setState({apiService: "association", apiMethod: "obsExpRatio"})
+            this.setState({apiService: "association", apiMethod: "obsExpRatio", apiResultsDisplay: false})
         }
     }
 
     handleMethodSelectChange = (method) => {
-        this.setState({apiMethod: method})  
+        this.setState({apiMethod: method, apiResultsDisplay: false})  
     }
 
     handleSubmitChange = (results) => {
@@ -214,18 +213,7 @@ class MainComp extends Component {
 
                 {/* results */}
                 <Grid item container xs={12}  justifyContent="space-around">
-                    <List aria-label="mailbox folders" sx={{ display: 'flex',flexDirection:"column",alignItems:"stretch"}}>
-                        {this.state.apiResultsDisplay &&
-                            <ListSubheader>
-                                {this.state.apiResults.length} Results returned. Please note if the count number is less than ten, no results will be returned.
-                            </ListSubheader>
-                        }
-                        {this.state.apiResultsDisplay &&
-                            this.state.apiResults.map((result, i) =>
-                                <SinelgResultDisplayComp key={i} result={result} service={this.state.apiResultsDisplayService} method={this.state.apiResultsDisplayMethod}>{i}</SinelgResultDisplayComp>
-                            )
-                        }
-                    </List>
+                    <ResultComp apiResults={this.state.apiResults} apiResultsDisplay={this.state.apiResultsDisplay} apiMethod={this.state.apiMethod} apiService={this.state.apiService} />                    
                 </Grid>
 
 
