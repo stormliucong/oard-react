@@ -8,23 +8,16 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+
+
 
 
 class ServiceSelectComp extends Component {
 
     state = {
-        serviceHelperOpen: false,
-        apiService: "frequencies",
-        rows:
-            [
-                { id: 1, service: 'frequencies', desc: 'return absoulte count and frequencies.' },
-                { id: 2, service: 'association', desc: 'return statistic based associations.' },
-            ],
-        columns:
-            [
-                { field: "service", headerName: "Service", width: 200 },
-                { field: "desc", headerName: "Description", width: 500 },
-            ]
+        serviceHelperOpen: false
     }
 
     handleServiceHelperOpen = () => {
@@ -35,39 +28,43 @@ class ServiceSelectComp extends Component {
     }
 
     onServiceSelectChange = (e) => {
-        this.setState({ apiService: e.target.value })
         this.props.handleServiceSelectChange(e.target.value);
     }
 
     render() {
         return (
-            <FormControl sx={{ display: 'flex' }}>
-                <InputLabel>Service<InfoIcon onClick={this.handleServiceHelperOpen}></InfoIcon></InputLabel>
+            <Grid item xs={12} md={6} lg={2}>
+                            
+                
+                <FormControl sx={{ display: 'flex' }}>
+                    <InputLabel>Service </InputLabel>
+
+                    <Select
+                        value={this.props.apiService}
+                        label="service"
+                        displayEmpty
+                        onChange={this.onServiceSelectChange}
+                    >
+                        <MenuItem value="frequencies">frequencies</MenuItem>
+                        <MenuItem value="association" sx={{
+                            display: this.props.queryConceptList1.length ? "inline" : "none"
+                        }}>association</MenuItem>
+                    </Select>
+                </FormControl>
+                <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleServiceHelperOpen}>
+                    How to select service?
+                </Button>    
                 <Dialog
                     fullWidth={true}
                     open={this.state.serviceHelperOpen}
                     onClose={this.handleServiceHelperClose}
                 >
-                    <DialogTitle id="alert-dialog-title">
-                        {"Use service select Helper"}
-                    </DialogTitle>
                     <DialogContent>
-                        <div style={{ height: 500, width: "100%" }}>
-                            <DataGrid rows={this.state.rows} columns={this.state.columns} />
-                        </div >
+                        Frequencies: It will return single or pair concept count and frequencies; Association; Association: It will return asssociation based on statistics.
                     </DialogContent>
                 </Dialog>
-                <Select
-                    value={this.props.queryConceptList1.length ? this.state.apiService : "frequencies"}
-                    label="service"
-                    onChange={this.onServiceSelectChange}
-                >
-                    <MenuItem value="frequencies">frequencies</MenuItem>
-                    <MenuItem value="association" sx={{
-                        display: this.props.queryConceptList1.length ? "inline" : "none"
-                    }}>association</MenuItem>
-                </Select>
-            </FormControl>
+            </Grid>
+
 
 
 

@@ -8,13 +8,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 class ReturnSelectComp extends Component {
 
     state = {
-        returnHelperOpen: false,
-        topN: "25",
+        returnHelperOpen: false
     }
 
     handleReturnHelperOpen = () => {
@@ -25,27 +25,27 @@ class ReturnSelectComp extends Component {
     }
 
     onReturnSelectChange = (e) => {
-        this.setState({ topN: e.target.value })
         this.props.handleReturnSelectChange(e.target.value);
     }
 
     render() {
 
         return (
-            <FormControl sx={{ display: 'flex' }}>
-                <InputLabel>Return<InfoIcon onClick={this.handleReturnHelperOpen}></InfoIcon></InputLabel>
-                <Dialog
-                    fullWidth={true}
-                    open={this.state.returnHelperOpen}
-                    onClose={this.handleReturnHelperClose}
-                >
-                    <DialogTitle id="alert-dialog-title">
-                        {"return top ranked results"}
-                    </DialogTitle>
-                </Dialog>
+            <Grid item xs={12} md={6} lg={2}>
+                <FormControl sx={{ display: 'flex' }} disabled={this.props.queryConceptList2.length != 0 || this.props.apiMethod == "singleConceptFreq" ? true : false}>
+                    <InputLabel>Return<InfoIcon onClick={this.handleReturnHelperOpen}></InfoIcon></InputLabel>
+                    <Dialog
+                        fullWidth={true}
+                        open={this.state.returnHelperOpen}
+                        onClose={this.handleReturnHelperClose}
+                    >
+                        <DialogTitle id="alert-dialog-title">
+                            {"return top ranked results"}
+                        </DialogTitle>
+                    </Dialog>
 
                     <Select
-                        value={this.state.topN}
+                        value={this.props.topN}
                         label="Top N"
                         onChange={this.onReturnSelectChange}
                     >
@@ -55,7 +55,21 @@ class ReturnSelectComp extends Component {
                         <MenuItem value="100">100</MenuItem>
                         <MenuItem value="100">500</MenuItem>
                     </Select>
-            </FormControl>
+                </FormControl>
+                <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleReturnHelperOpen}>
+                    How to select return?
+                </Button>    
+                <Dialog
+                    fullWidth={true}
+                    open={this.state.returnHelperOpen}
+                    onClose={this.handleReturnHelperClose}
+                >
+                    <DialogContent>
+                        Return top N results when no concept 2 list is provided. When concept 2 is provided, this parameter is disabled.
+                    </DialogContent>
+                </Dialog>
+            </Grid>
+
 
         )
     }

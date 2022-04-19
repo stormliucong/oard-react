@@ -19,32 +19,32 @@ import Container from '@mui/material/Container';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
-
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 
 class DsSelectComp extends Component {
   state = {
     dtHelperOpen: false,
-    dataset: "1",
     rows: null,
     columns:
       [
         { field: "id", hide: true },
-        { field: "short_name", headName: "dataset_name", hide: true},
-        { field: "dataset_id", headerName: "dataset_id", width:100},
+        { field: "short_name", headName: "dataset_name", hide: true },
+        { field: "dataset_id", headerName: "dataset_id", width: 100 },
         { field: "clinical_site", headerName: "clinical_site", width: 100 },
         { field: "source", headerName: "source", width: 100 },
         { field: "subpopulation", headerName: "subpopulation", width: 150 },
         { field: "subclass_category", headerName: "subclass_category", width: 300 },
       ]
   }
-  
+
 
   getFile = async () => {
     try {
       // generate a request
       var getUrl = window.location;
-      var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+      var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
       const ax = axios.create({
         baseURL: baseUrl
       })
@@ -73,63 +73,64 @@ class DsSelectComp extends Component {
             )
           })
         })
-      } catch (err) {
+    } catch (err) {
       console.error(err);
     }
   }
 
-    handleDtHelperOpen = () => {
-        this.setState({ dtHelperOpen: true });
-    }
-    handleDtHelperClose = () => {
-        this.setState({ dtHelperOpen: false });
-    }
+  handleDtHelperOpen = () => {
+    this.setState({ dtHelperOpen: true });
+  }
+  handleDtHelperClose = () => {
+    this.setState({ dtHelperOpen: false });
+  }
 
-    onDatasetSelectChange = (e) =>{
-        this.setState({dataset: e.target.value})
-        this.props.handleDatasetSelectChange(e.target.value);
+  onDatasetSelectChange = (e) => {
+    this.props.handleDatasetSelectChange(e.target.value);
 
-    }
+  }
 
 
   //load only once.
-  componentDidMount(){
+  componentDidMount() {
     this.getFile();
   }
   render() {
-   
+
     return (
+      <Grid item xs={12} md={6} lg={2}>
         <FormControl sx={{ display: 'flex' }}>
 
-        <InputLabel>Dataset<InfoIcon onClick={this.handleDtHelperOpen}></InfoIcon></InputLabel>
-        <Dialog
-            fullWidth={true}
-            open={this.state.dtHelperOpen}
-            onClose={this.handleDtHelperClose}
-        >
-            <DialogTitle id="alert-dialog-title">
-            {"Use data select Helper"}
-            </DialogTitle>
-             <DialogContent>         
-                    <DsHelperComp rows={this.state.rows} columns={this.state.columns} />
-            </DialogContent></Dialog>
-        
-        <Select
-            value={this.state.dataset}
+          <InputLabel>Dataset</InputLabel>
+          <Select
+            value={this.props.dataset}
             label="Dataset"
             onChange={this.onDatasetSelectChange}
-        >
+          >
             {
-                this.state.rows && 
-                this.state.rows.map((row, i) =>
-                    <MenuItem key={i} value={row.dataset_id}>{row.short_name}</MenuItem>
-                )
-                
+              this.state.rows &&
+              this.state.rows.map((row, i) =>
+                <MenuItem key={i} value={row.dataset_id}>{row.short_name}</MenuItem>
+              )
+
 
             }
 
-        </Select>
-    </FormControl>
+          </Select>
+        </FormControl>
+        <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleDtHelperOpen}>
+          How to select dataset?
+        </Button>
+        <Dialog
+          fullWidth={true}
+          open={this.state.dtHelperOpen}
+          onClose={this.handleDtHelperClose}
+        >
+          <DialogContent>
+            <DsHelperComp rows={this.state.rows} columns={this.state.columns} />
+          </DialogContent></Dialog>
+      </Grid>
+
     );
   }
 }

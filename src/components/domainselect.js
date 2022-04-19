@@ -8,13 +8,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 class DomainSelectComp extends Component {
 
     state = {
         domainHelperOpen: false,
-        domain: "phenotypes",
         rows:
             [
                 {id : 1, domain: 'All', desc: 'return both HPO and MONDO terms'},
@@ -43,24 +43,11 @@ class DomainSelectComp extends Component {
     render() {
 
         return (
-            <FormControl sx={{ display: 'flex' }}>
-                <InputLabel>Domain<InfoIcon onClick={this.handleDomainHelperOpen}></InfoIcon></InputLabel>
-                <Dialog
-                    fullWidth={true}
-                    open={this.state.domainHelperOpen}
-                    onClose={this.handleDomainHelperClose}
-                >
-                    <DialogTitle id="alert-dialog-title">
-                        {"Use domain select Helper"}
-                    </DialogTitle>
-                    <DialogContent>
-                        <div style={{ height: 500, width: "100%" }}>
-                            <DataGrid rows={this.state.rows} columns={this.state.columns} />
-                        </div >
-                    </DialogContent>
-                    </Dialog>
+            <Grid item xs={12} md={6} lg={2}>
+                <FormControl sx={{ display: 'flex' }} disabled={this.props.queryConceptList2.length != 0 || this.props.apiMethod == "singleConceptFreq" ? true : false}>
+                <InputLabel>Domain</InputLabel>
                 <Select
-                    value={this.state.domain}
+                    value={this.props.domain}
                     label="Domain"
                     onChange={this.onDomainSelectChange}
                 >
@@ -69,6 +56,22 @@ class DomainSelectComp extends Component {
                     <MenuItem value="diseases">Diseases/Mondo</MenuItem>
                 </Select>
             </FormControl>
+            <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleDomainHelperOpen}>
+                    How to select domain?
+                </Button>    
+                <Dialog
+                    fullWidth={true}
+                    open={this.state.domainHelperOpen}
+                    onClose={this.handleDomainHelperClose}
+                >
+                    <DialogContent>
+                            <div style={{ height: 500, width: "100%" }}>
+                                <DataGrid rows={this.state.rows} columns={this.state.columns} />
+                            </div >
+                        </DialogContent>
+                </Dialog>
+            </Grid>
+            
 
         )
     }

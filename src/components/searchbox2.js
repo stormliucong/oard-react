@@ -3,10 +3,14 @@ import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
-
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 class SearchBox2Comp extends Component {
 
     state = {
+        sb2HelperOpen: '',
         queryText: '',
         querySugList: [
             {
@@ -64,20 +68,27 @@ class SearchBox2Comp extends Component {
         this.setState({ querySugList: terms })
     }
 
-    onSearchBox1Change = (event, newValue) => {
-        this.setState({ queryConceptList2: [...newValue] })
+    onSearchBox2Change = (event, newValue) => {
         this.props.handleSearchBox2SelectChange(newValue)
+    }
+    handleSb2HelperOpen = () => {
+        this.setState({ sb2HelperOpen: true });
+    }
+    handleSb2HelperClose = () => {
+        this.setState({ sb2HelperOpen: false });
     }
 
     
 
     render() {
         return (
-                <Autocomplete
+            <Grid item xs={12} lg={6}>
+                       <Autocomplete
                     sx={{ display: 'flex' }}
                     disablePortal
                     multiple
                     id="combo-box-demo"
+                    disabled={this.props.queryConceptList1.length ? false : true}
                     getOptionLabel={(option) => option.name + " [" + option.id + "]"}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     options={this.state.querySugList}
@@ -91,6 +102,7 @@ class SearchBox2Comp extends Component {
                     }}
                     // user select from suggestion list
                     onChange={this.onSearchBox2Change}
+                    value={this.props.queryConceptList2}
                     renderOption={(props, option) => (
                         <Box component="li" {...props}>
                             <Box sx={{
@@ -112,11 +124,25 @@ class SearchBox2Comp extends Component {
                         <TextField
                             {...params}
                             variant="standard"
-                            label="Query Concept List 2 (Leave blank for most frequent single concept)"
+                            label={this.props.queryConceptList1.length ? "Query Concept 2" : "Input Query Concept 1 first" }
                             placeholder="add more"
                         />
                     )}
                 />
+                <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleSb2HelperOpen}>
+                    What shoud I input here?
+                </Button>
+                <Dialog
+                    fullWidth={true}
+                    open={this.state.sb2HelperOpen}
+                    onClose={this.handleSb2HelperClose}
+                >
+                    <DialogContent>
+                       Input one or multiple phenotype/rare disease terms using the searching box. Only HPO, MONDO related terms are accepted. If it is empty, the top ranked pairwise statistics results will be returned based on the input in concept 1.
+                    </DialogContent>
+                </Dialog>
+                    </Grid>
+                
 
 
         )

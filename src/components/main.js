@@ -22,8 +22,8 @@ class MainComp extends Component {
     state = {
         queryConceptList1: [],
         queryConceptList2: [],
-        dataset: "1",
-        domain: "phenotypes",
+        dataset: "2",
+        domain: "all",
         topN: "25",
         apiService: "frequencies",
         apiMethod: "mostFrequency",
@@ -117,14 +117,29 @@ class MainComp extends Component {
 
 
     handleSearchBox1SelectChange = (newValue) => {
-        this.setState({ queryConceptList1: [...newValue] })
-        if (!this.state.queryConceptList1){
-            this.setState({queryConceptList2: [], apiService: "frequencies", apiMethod: "mostFrequency"})
+        if(!newValue.length){
+            //reset
+            this.setState({ queryConceptList1: [], queryConceptList2: [], apiService: "frequencies", apiMethod: "mostFrequency", topN: "25"})
+        }else{
+            if(this.state.apiMethod == 'mostFrequency'){
+                this.setState({ queryConceptList1: [...newValue], queryConceptList2: [], apiService: "frequencies", apiMethod: "singleConceptFreq"})
+            }else{
+                this.setState({queryConceptList1: [...newValue]})
+            }
         }
+        
     }
 
     handleSearchBox2SelectChange = (newValue) =>{
-        this.setState({ queryConceptList2: [...newValue] })
+        if(this.state.apiService == "frequencies"){
+            if(!newValue.length){
+                this.setState({queryConceptList2: [], apiMethod: "singleConceptFreq"})
+            }else{
+                this.setState({queryConceptList2: [...newValue], apiMethod: "pairedConceptFreq"})
+            }
+        }else{
+            this.setState({queryConceptList2: [...newValue]})
+        }
     }
 
     handleDatasetSelectChange = (ds) => {
@@ -140,7 +155,15 @@ class MainComp extends Component {
     }
 
     handleServiceSelectChange = (service) => {
-        this.setState({apiService: service})  
+        if (service == "frequencies" ){
+            if(!this.state.queryConceptList2.length){
+                this.setState({apiService: "frequencies", apiMethod: "singleConceptFreq"})
+            }else{
+                this.setState({apiService: "frequencies", apiMethod: "pairedConceptFreq"})
+            }
+        }else{
+            this.setState({apiService: "association", apiMethod: "obsExpRatio"})
+        }
     }
 
     handleMethodSelectChange = (method) => {
@@ -226,41 +249,28 @@ class MainComp extends Component {
                 {/* form */}
                 <Grid container item xs={12} spacing={5}  justifyContent="space-around">
                     {/* search box 1 */}
+                    <SearchBox1Comp handleSearchBox1SelectChange={this.handleSearchBox1SelectChange} queryConceptList1={this.state.queryConceptList1} />
                     
-                    <Grid item xs={12} lg={6} >
-                        <SearchBox1Comp handleSearchBox1SelectChange={this.handleSearchBox1SelectChange} />
-                    </Grid>
 
                     {/* search box 2 */}
-                    <Grid item xs={12} lg={6}>
-                        <SearchBox2Comp handleSearchBox2SelectChange={this.handleSearchBox2SelectChange} queryConceptList1={this.state.conceptList1} />
-                    </Grid>
-
-                    {/* dataset selection */}
-                    <Grid item xs={12} md={6} lg={2}>
-                        <DsSelectComp handleDatasetSelectChange={this.handleDatasetSelectChange} />
-                    </Grid>
-
-                    {/* domain selection */}
-                    <Grid item xs={12} md={6} lg={2}>
-                        <DomainSelectComp handleDomainSelectChange={this.handleDomainSelectChange} queryConceptList1={this.state.queryConceptList1} queryConceptList2={this.state.queryConceptList2} />
-                    </Grid>
-
-                    {/* return selection */}
-                    <Grid item xs={12} md={6} lg={2}>
-                        <ReturnSelectComp handleReturnSelectChange={this.handleReturnSelectChange} />
-                    </Grid>
+                    <SearchBox2Comp handleSearchBox2SelectChange={this.handleSearchBox2SelectChange} queryConceptList1={this.state.queryConceptList1} queryConceptList2={this.state.queryConceptList2} />
+                    
 
                     {/* service selection */}
-                    <Grid item xs={12} md={6} lg={2}>
-                        <ServiceSelectComp handleServiceSelectChange={this.handleServiceSelectChange} queryConceptList1={this.state.queryConceptList1}/>
-                    </Grid>
+                    <ServiceSelectComp handleServiceSelectChange={this.handleServiceSelectChange} apiService={this.state.apiService} queryConceptList1={this.state.queryConceptList1}/>
 
                     {/* method selection */}
-                    <Grid item xs={12} md={6} lg={2}>
-                        <MethodSelectComp handleMethodSelectChange={this.handleMethodSelectChange} apiService={this.state.apiService} queryConceptList1={this.state.queryConceptList1} queryConceptList2={this.state.queryConceptList2}/>
-                        
-                    </Grid>
+                    <MethodSelectComp handleMethodSelectChange={this.handleMethodSelectChange} apiService={this.state.apiService} apiMethod={this.state.apiMethod} queryConceptList1={this.state.queryConceptList1} queryConceptList2={this.state.queryConceptList2}/>  
+
+                    {/* dataset selection */}
+                    <DsSelectComp handleDatasetSelectChange={this.handleDatasetSelectChange} dataset={this.state.dataset}/>
+                    
+
+                    {/* domain selection */}
+                    <DomainSelectComp handleDomainSelectChange={this.handleDomainSelectChange} domain={this.state.domain} apiMethod={this.state.apiMethod} queryConceptList2={this.state.queryConceptList2} />
+
+                    {/* return selection */}
+                    <ReturnSelectComp handleReturnSelectChange={this.handleReturnSelectChange} topN={this.state.topN} apiMethod={this.state.apiMethod} queryConceptList2={this.state.queryConceptList2} />
 
                     {/* submit button */}
                     <Grid item container xs={12} md={6} lg={2} justifyContent="center">
