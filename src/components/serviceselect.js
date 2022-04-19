@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { DataGrid } from "@mui/x-data-grid";
-import InfoIcon from '@mui/icons-material/Info';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';

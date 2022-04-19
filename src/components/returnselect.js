@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { DataGrid } from "@mui/x-data-grid";
 import InfoIcon from '@mui/icons-material/Info';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';

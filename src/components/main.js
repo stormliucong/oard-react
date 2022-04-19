@@ -1,11 +1,4 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import List from '@mui/material/List';
-import ListSubheader from '@mui/material/ListSubheader';
-import Button from '@mui/material/Button';
-import SinelgResultDisplayComp from './singleresult'
 import DsSelectComp from './datasetselect'
 import DomainSelectComp from './domainselect'
 import ReturnSelectComp from './returnselect'
@@ -122,7 +115,7 @@ class MainComp extends Component {
             if(this.state.apiMethod == 'mostFrequency'){
                 this.setState({ queryConceptList1: [...newValue], queryConceptList2: [], apiService: "frequencies", apiMethod: "singleConceptFreq", apiResultsDisplay: false})
             }else{
-                this.setState({queryConceptList1: [...newValue]})
+                this.setState({queryConceptList1: [...newValue], apiResultsDisplay: false})
             }
         }
         
@@ -215,9 +208,6 @@ class MainComp extends Component {
                 <Grid item container xs={12}  justifyContent="space-around">
                     <ResultComp apiResults={this.state.apiResults} apiResultsDisplay={this.state.apiResultsDisplay} apiMethod={this.state.apiMethod} apiService={this.state.apiService} />                    
                 </Grid>
-
-
-
             </Grid>
         );
     }
