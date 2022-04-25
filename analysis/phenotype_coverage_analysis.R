@@ -120,7 +120,7 @@ fig2b = subHitCountDf %>%
   scale_color_viridis_d(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
-  scale_size_continuous(name = "HPO subongoloty size (# of concepts)", breaks = c(10, 100, 1000)) + 
+  scale_size_continuous(name = "HPO subontology size (# of concepts)", breaks = c(10, 100, 1000)) + 
   labs(title = "(B)",color = "Dataset", shape  = "Dataset", linetype = "Dataset", size = "# of total concepts") +
   theme(plot.title = element_text(hjust = 0.5)) + coord_flip()
 
@@ -221,7 +221,7 @@ stringHitCountDf = hitCountDf %>% inner_join(charLenDf) %>%
 fig2e = stringHitCountDf %>%
   ggplot(aes(y=ratio,x=as.factor(min_avg_string_length_bin), group = as.factor(dataset_id))) + 
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
-  xlab("String length") +
+  xlab("Token average string length") +
   ylab("") + 
   scale_shape_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
@@ -321,4 +321,15 @@ lay <- rbind(c(1,1,2,2,2),
              c(3,4,5,6,7))
 # grid.arrange(fig2a, fig2b, fig2c, fig2d, ncol = 2)
 grid.arrange(fig2a, fig2b, fig2c, fig2d, fig2e, fig2f, fig2g,layout_matrix = lay)
+
+## To answer Kai's comments "What about “at least one”? right now the number seems low but it is possible that many HPO terms are super rare or highly specific."
+
+# 
+# rm(list=ls())
+# library(data.table)
+# concept_count = fread("../../material/concept_count/concept_count.csv")
+# unique_concept_id = data.table(unique(concept_count[,concept_id]))
+# colnames(unique_concept_id) = 'concept_id'
+# sum(unique_concept_id >= 90000000)
+
 

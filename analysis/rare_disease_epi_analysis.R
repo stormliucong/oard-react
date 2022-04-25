@@ -65,7 +65,7 @@ fig3a = overallHitCountDf %>%
   ylab("Number of rare diseases") + 
   scale_x_discrete(name="Dataset",
                       breaks=c("1", "2", "3"),
-                      labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes"))+ 
+                      labels=c("CUIMC/OMOP", "CUIMC/Notes", "CHOP/Notes"))+ 
   scale_fill_viridis_d(name="EHR Prevalence",
                    breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
                    labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
@@ -88,7 +88,7 @@ prevHitCount = hitCountDf %>% inner_join(mondoXref) %>% inner_join(prev) %>%
   summarise(count_of_concepts = n_distinct(MONDO_ID)) %>% as_tibble() %>%
   mutate(dataset_id = as.factor(dataset_id))
 levels(prevHitCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
-levels(prevHitCount$dataset_id) = c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")
+levels(prevHitCount$dataset_id) = c("CUIMC/OMOP", "CUIMC/Notes", "CHOP/Notes")
 prevHitCount = prevHitCount %>% mutate(annotation_class = replace(annotation_class, annotation_class == "6-9 / 10 000", "1-9 / 10 000"))
 prevHitCount = prevHitCount %>% mutate(annotation_class = replace(annotation_class, annotation_class == "1-5 / 10 000", "1-9 / 10 000"))
 prevHitCount = prevHitCount %>% filter(!annotation_class %in% c("Unknown_epidemiological_range",">1 / 1000"))
@@ -126,7 +126,7 @@ inherHitCount = hitCountDf %>% inner_join(mondoXref) %>% inner_join(inheritance)
   mutate(dataset_id = as.factor(dataset_id)) %>%
   mutate(annotation_class = as.factor(annotation_class))
 levels(inherHitCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
-levels(inherHitCount$dataset_id) = c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")
+levels(inherHitCount$dataset_id) = c("CUIMC/OMOP", "CUIMC/Notes", "CHOP/Notes")
 levels(inherHitCount$annotation_class)
 inherHitCount = inherHitCount %>% filter(!annotation_class %in% c("Y-linked","oligogenic","semi-dominant","no inheritance data available","unknown inheritance"))
 # 
@@ -164,11 +164,11 @@ onsetHitCount = hitCountDf %>% inner_join(mondoXref) %>% inner_join(onset) %>%
   mutate(dataset_id = as.factor(dataset_id)) %>%
   mutate(annotation_class = as.factor(annotation_class))
 levels(onsetHitCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
-levels(onsetHitCount$dataset_id) = c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")
+levels(onsetHitCount$dataset_id) = c("CUIMC/OMOP", "CUIMC/Notes", "CHOP/Notes")
 onsetHitCount$annotation_class = factor(onsetHitCount$annotation_class, levels = c(
   "antenatal","neonatal","infancy","childhood","adolescent","adult","elderly","all ages","no age of onset data available"
 ))
-levels(onsetHitCount$annotation_class)[9] = "no available"
+levels(onsetHitCount$annotation_class)[9] = "not available"
 onsetHitCount = onsetHitCount %>% group_by(dataset_id,prev_bin,annotation_class) %>% summarise(count_of_concepts = sum(count_of_concepts))
 
 fig3d = onsetHitCount %>% 
@@ -232,11 +232,11 @@ onsetHitOnsetCount = hitAgeCountDf %>% inner_join(mondoXref) %>% inner_join(onse
   mutate(dataset_id = as.factor(dataset_id)) %>%
   mutate(annotation_class = as.factor(annotation_class))
 levels(onsetHitOnsetCount$prev_bin) = c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")
-levels(onsetHitOnsetCount$dataset_id) = c("neonatal & early life", "childhood", "adolescent","adult")
+levels(onsetHitOnsetCount$dataset_id) = c("neonatal & early life", "childhood", "adolescence","adulthood")
 onsetHitOnsetCount$annotation_class = factor(onsetHitOnsetCount$annotation_class, levels = c(
   "antenatal","neonatal","infancy","childhood","adolescent","adult","elderly","all ages","no age of onset data available"
 ))
-levels(onsetHitOnsetCount$annotation_class)[9] = "no available"
+levels(onsetHitOnsetCount$annotation_class)[9] = "not available"
 
 efig1 = onsetHitOnsetCount %>% 
   ggplot(aes(fill=as.factor(prev_bin), y=count_of_concepts, x=as.factor(annotation_class))) +
