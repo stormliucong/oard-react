@@ -22,14 +22,12 @@ class CardComp extends Component {
                     image="/OARD_logo.png"
                     alt="green iguana"
                     />
-                    {/* <CardContent>
-                    <Typography gutterBottom variant="h2" component="div">
-                        OARD
-                    </Typography>
+                <CardContent>
                     <Typography variant="body2" color="text.secondary">
-                    OARD: An Open Real-world based Annotation for Rare Diseases and its Associated Phenotypes
+                          OARD is able to return (1) single concept frequency (or most freqeuent concept if no concepts provided; 
+                          (2) paired concept cofrequencies or association (or most frequently co-occurred / most associated if no second concepts provided; 
                     </Typography>
-                    </CardContent> */}
+                </CardContent>
                 </CardActionArea>
                 </Card>
                 </Grid>
