@@ -28,6 +28,7 @@ class CardComp extends Component {
                           (2) paired concept cofrequencies or association (or most frequently co-occurred / most associated if no second concepts provided; 
                     </Typography>
                 </CardContent>
+                    <Button size="small" href="https://github.com/stormliucong/oard-react/tree/master/tutorial">Learn More</Button>                                                      
                 </CardActionArea>
                 </Card>
                 </Grid>
