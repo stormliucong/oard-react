@@ -13,7 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 const pages = [
     {'name': 'API','href': 'https://rare.cohd.io/api'},
     {'name': 'GitHub', 'href': 'https://github.com/stormliucong/oard-react'},
-    {'name': 'About', 'href': 'https://github.com/stormliucong/oard-react'},
+    {'name': 'Tutorial', 'https://github.com/stormliucong/oard-react/tree/master/tutorial'},
     {'name': 'COHD', 'href': 'https://cohd.io/'},
     {'name': 'WengLab', 'href': 'https://people.dbmi.columbia.edu/~chw7007/'},
     {'name': 'CUIMC/DBMI', 'href': 'https://www.dbmi.columbia.edu/'},
