@@ -57,7 +57,7 @@ class ServiceSelectComp extends Component {
                     onClose={this.handleServiceHelperClose}
                 >
                     <DialogContent>
-                        Frequencies: It will return single or pair concept count and frequencies; Association; Association: It will return asssociation based on statistics.
+                        <b> Frequencies </b> : It will return single or pair concept count and frequencies; <b> Association</b>: It will return asssociation based on statistics.
                     </DialogContent>
                 </Dialog>
             </Grid>
