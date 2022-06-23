@@ -12,7 +12,7 @@ class ResultComp extends Component {
             <List aria-label="mailbox folders" sx={{ display: 'flex', flexDirection: "column", alignItems: "stretch" }}>
                 {this.props.apiResultsDisplay &&
                     <ListSubheader>
-                        {this.props.apiResults.length} Results returned. Please note if the count number is less than ten, no results will be returned.
+                        {this.props.apiResults.length} Result(s) returned. Please note if the patient count number is less than 10, no results will be returned.
                     </ListSubheader>
                 }
                 {this.props.apiResultsDisplay &&
