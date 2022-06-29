@@ -57,14 +57,14 @@ class ReturnSelectComp extends Component {
                 </FormControl>
                 <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleReturnHelperOpen}>
                     How to select return?
-                </Button>    
+                </Button>
                 <Dialog
                     fullWidth={true}
                     open={this.state.returnHelperOpen}
                     onClose={this.handleReturnHelperClose}
                 >
                     <DialogContent>
-                        Return top N results when no concept 2 list is provided. When concept 2 is provided, this parameter is disabled.
+                        Return top N results when concept 2 is not provided. When concept 2 is provided, this parameter is disabled.
                     </DialogContent>
                 </Dialog>
             </Grid>

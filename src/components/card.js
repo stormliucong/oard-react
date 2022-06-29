@@ -11,8 +11,8 @@ class CardComp extends Component {
             <Container sx={{paddingTop: 5}}>
                 <Grid container justifyContent="center">
                     <Card sx={{
-                        maxWidth: 1000, 
-                       
+                        maxWidth: 1000,
+
                             width: {xs: "50%", md: "40%", lg: "30%"}
                     }
                     } >
@@ -24,11 +24,11 @@ class CardComp extends Component {
                     />
                 <CardContent>
                     <Typography variant="body2" color="text.secondary">
-                          OARD is able to return (1) single concept frequency (or most freqeuent concept if no concepts provided; 
-                          (2) paired concept cofrequencies or association (or most frequently co-occurred / most associated if no second concepts provided; 
+                          OARD is able to return (1) single concept frequency (or most freqeuent concepts if Query Concept List 1 is not provided);
+                          (2) paired concept cofrequencies or associations (or most frequently co-occurring / most associated concepts if Query Concept 2 is not provided).
                     </Typography>
                 </CardContent>
-                    <Button size="small" href="https://github.com/stormliucong/oard-react/tree/master/tutorial">Learn More</Button>                                                      
+                    <Button size="small" href="https://github.com/stormliucong/oard-react/tree/master/tutorial">Learn More</Button>
                 </CardActionArea>
                 </Card>
                 </Grid>

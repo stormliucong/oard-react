@@ -52,7 +52,7 @@ class SearchBox2Comp extends Component {
                 // console.log(doc)
                 if(doc.obo_id  !== undefined){
                     if (doc.obo_id.startsWith('MONDO:') || doc.obo_id.startsWith('HP:') || doc.obo_id.startsWith('Orphanet:') || doc.obo_id.startsWith('OMIM:')) {
-                        
+
                         // term.group = doc.obo_id.startsWith('MONDO:') ? 'MONDO DISEASE' : 'HPO Phenotype'
                         var label = doc.label
                         var id = doc.obo_id
@@ -62,7 +62,7 @@ class SearchBox2Comp extends Component {
                         }
                     }
                 }
-                
+
             });
         }
         this.setState({ querySugList: terms })
@@ -78,7 +78,7 @@ class SearchBox2Comp extends Component {
         this.setState({ sb2HelperOpen: false });
     }
 
-    
+
 
     render() {
         return (
@@ -138,11 +138,11 @@ class SearchBox2Comp extends Component {
                     onClose={this.handleSb2HelperClose}
                 >
                     <DialogContent>
-                       Input one or multiple phenotype/rare disease terms using the searching box. Only HPO, MONDO related terms are accepted. If it is empty, the top ranked pairwise statistics results will be returned based on the input in concept 1.
+                       Input one or multiple phenotype/rare disease terms using the search box. Only HPO and MONDO related terms are accepted. If it is empty, the top ranked pairwise statistics results will be returned based on the input in concept 1.
                     </DialogContent>
                 </Dialog>
                     </Grid>
-                
+
 
 
         )
