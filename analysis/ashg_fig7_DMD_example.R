@@ -67,7 +67,7 @@ dmd_reviewed_precision =
     dmd_reviewed_summary %>% group_by(ln_ratio_category_5) %>% summarise(precision = sum(clinical)/length(ln_ratio)) %>% filter(ln_ratio_category_5) %>% mutate(`log OR >` = 5) %>% select(`log OR >`,precision)
   )
 
-fig1 = dmd_reviewed_precision %>% ggplot(aes(x = as.factor(`log OR >`), y = precision)) + geom_bar(stat = "identity") + ylim(c(0,1)) + xlab("log OR >")
+fig1 = dmd_reviewed_precision %>% ggplot(aes(x = as.factor(`log OR >`), y = precision)) + geom_bar(stat = "identity") + ylim(c(0,1)) + xlab("log OR >") + ylab("Precision")
 
 
 
@@ -91,7 +91,7 @@ dmd_jdm_summary =
   rbind(
     dmd_reviewed[is_dmd==FALSE & is_jdm ==TRUE] %>% group_by(is_dmd) %>% summarise(precision = sum(clinical)/length(ln_ratio)) %>% mutate(category = 'JDM only') %>% select(category,precision)
   )
-fig3 = dmd_jdm_summary %>% ggplot(aes(x = category, y = precision)) + geom_bar(stat = "identity") + ylim(c(0,1)) + xlab("category")
+fig3 = dmd_jdm_summary %>% ggplot(aes(x = category, y = precision)) + geom_bar(stat = "identity") + ylim(c(0,1)) + xlab("") + ylab("Precision") + theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 
 # grid
 require(gridExtra)

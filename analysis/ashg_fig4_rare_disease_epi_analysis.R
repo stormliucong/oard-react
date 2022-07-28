@@ -66,6 +66,7 @@ fig3a = overallHitCountDf %>%
   scale_x_discrete(name="Dataset",
                       breaks=c("1", "2", "3"),
                       labels=c("CUIMC/OMOP", "CUIMC/Notes", "CHOP/Notes"))+ 
+  scale_y_continuous(labels = scales::comma) +
   scale_fill_viridis_d(name="EHR Prevalence",
                    breaks=c("[0,5e-06]", "(5e-06,5e-05]", "(5e-05,0.0005]","(0.0005,1]"),
                    labels=c("< 1/200,000", "< 1/20,000", "< 1/2,000", "> 1/2,000")) + 
@@ -93,8 +94,9 @@ prevHitCount = prevHitCount %>% mutate(annotation_class = replace(annotation_cla
 prevHitCount = prevHitCount %>% mutate(annotation_class = replace(annotation_class, annotation_class == "1-5 / 10 000", "1-9 / 10 000"))
 prevHitCount = prevHitCount %>% filter(!annotation_class %in% c("Unknown_epidemiological_range",">1 / 1000"))
 prevHitCount = prevHitCount %>% mutate(annotation_class = as.factor(annotation_class))
+levels(prevHitCount$annotation_class) = c("<1 / 1,000,000", "1-9 / 1,000,000","1-9 / 10,000","1-9 / 100,000")
 prevHitCount$annotation_class = factor(prevHitCount$annotation_class, levels = 
-                                         c("<1 / 1 000 000", "1-9 / 1 000 000","1-9 / 100 000","1-9 / 10 000"))
+                                         c("<1 / 1,000,000", "1-9 / 1,000,000","1-9 / 100,000","1-9 / 10,000"))
 prevHitCount = prevHitCount %>% group_by(dataset_id,prev_bin,annotation_class) %>% summarise(count_of_concepts = sum(count_of_concepts))
 
 fig3b = prevHitCount %>% 
