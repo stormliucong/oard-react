@@ -36,3 +36,4 @@ analysis/*.log
 *pdf*
 *.Renviron*
 .vscode*
+*package-lock.json

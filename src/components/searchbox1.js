@@ -144,7 +144,7 @@ class SearchBox1Comp extends Component {
                     onClose={this.handleSb1HelperClose}
                 >
                     <DialogContent>
-                       Input one or multiple phenotype/rare disease terms using the searching box. Only HPO, MONDO related terms are accepted. If it is empty, the only supported query is the top ranked concept list based on single concept frequencies.
+                       Input one or multiple phenotype/rare disease terms using the search box. Only HPO and MONDO related terms are accepted. If it is empty, the only supported query is the top ranked concept list based on single concept frequencies.
                     </DialogContent>
                 </Dialog>
 

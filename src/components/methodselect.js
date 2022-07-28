@@ -20,15 +20,15 @@ class MethodSelectComp extends Component {
                 { id: 1, method: 'singleConceptFreq', desc: 'return clinical frequency of individual concepts' },
                 { id: 2, method: 'pairedConceptFreq', desc: 'return clinical frequency of a pair of concepts' },
                 { id: 3, method: 'mostFrequency', desc: 'return most frequent single concepts (or concept pairs if one concept 1 is provided)' },
-                { id: 4, method: 'chiSquare', desc: 'return chi-square analysis of paired concepts (or top largest chi-square concept paris if one or multiple concept 1 are provided' },
-                { id: 5, method: 'obsExpRatio', desc: 'return observed count / expected count of paired concepts (or top largest obsExpRatio concept paris if one or multiple concept 1 are provided'},
-                { id: 6, method: 'relativeFrequency', desc: 'return Relative frequency  of a pair of concepts (or top largest relativeFrequency concept paris if one or multiple concept 1 are provided' },
-                { id: 7, method: 'jaccardIndex', desc: 'return Jaccard index of a pair of concepts (or top largest jaccardIndex concept paris if one or multiple concept 1 are provided' },
+                { id: 4, method: 'chiSquare', desc: 'return chi-square analysis of paired concepts (or top largest chi-square concept pairs if one or more concept 1 are provided' },
+                { id: 5, method: 'obsExpRatio', desc: 'return observed count / expected count of paired concepts (or top largest obsExpRatio concept pairs if one or more concept 1 are provided'},
+                { id: 6, method: 'relativeFrequency', desc: 'return relative frequency of a pair of concepts (or top largest relativeFrequency concept pairs if one or more concept 1 are provided' },
+                { id: 7, method: 'jaccardIndex', desc: 'return Jaccard index of a pair of concepts (or top largest jaccardIndex concept pairs if one or more concept 1 are provided' },
 
             ],
         columns:
             [
-                { field: "method", headerName: "Mervice", width: 200 },
+                { field: "method", headerName: "Method", width: 200 },
                 { field: "desc", headerName: "Description", width: 1000 },
             ]
     }
@@ -83,7 +83,7 @@ class MethodSelectComp extends Component {
                 </FormControl>
                 <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleMethodHelperOpen}>
                     How to select method?
-                </Button>    
+                </Button>
                 <Dialog
                     fullWidth={true}
                     open={this.state.methodHelperOpen}

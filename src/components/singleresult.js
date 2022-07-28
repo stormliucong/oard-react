@@ -34,7 +34,7 @@ class SinelgResultDisplayComp extends Component {
                     break;
                 case 'obsExpRatio': // foo is 0 so criteria met here so this block will run
                     console.log(0);
-                    sencondaryName = 'LnRatio: ' + Math.round(this.props.result.ws_ln_ratio * 1000) / 1000
+                    sencondaryName = 'obsExpRatio (log scale): ' + Math.round(this.props.result.ws_ln_ratio * 1000) / 1000
                     break;
                 // NOTE: the forgotten break would have been here
                 case 'relativeFrequency': // no break statement in 'case 0:' so this case will run as well

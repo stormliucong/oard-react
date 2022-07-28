@@ -31,8 +31,8 @@ class ServiceSelectComp extends Component {
     render() {
         return (
             <Grid item xs={12} md={6} lg={2}>
-                            
-                
+
+
                 <FormControl sx={{ display: 'flex' }}>
                     <InputLabel>Service </InputLabel>
 
@@ -50,14 +50,14 @@ class ServiceSelectComp extends Component {
                 </FormControl>
                 <Button sx={{ display: 'block', mt: 2 }} size="small" onClick={this.handleServiceHelperOpen}>
                     How to select service?
-                </Button>    
+                </Button>
                 <Dialog
                     fullWidth={true}
                     open={this.state.serviceHelperOpen}
                     onClose={this.handleServiceHelperClose}
                 >
                     <DialogContent>
-                        Frequencies: It will return single or pair concept count and frequencies; Association; Association: It will return asssociation based on statistics.
+                        <b> Frequencies</b>: OARD will return single or concept pair counts and frequencies; <b> Association</b>: OARD will return asssociations based on statistics.
                     </DialogContent>
                 </Dialog>
             </Grid>
