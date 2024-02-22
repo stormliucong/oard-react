@@ -36,7 +36,7 @@ class SearchBox1Comp extends Component {
     loadConceptsEbi = async (q) => {
         const query = q
         console.log(query)
-        var response = await axios.get('https://www.ebi.ac.uk/ols/api/select', {
+        var response = await axios.get('https://www.ebi.ac.uk/ols4/api/select', {
             params: {
                 q: query,
                 rows: 50,
