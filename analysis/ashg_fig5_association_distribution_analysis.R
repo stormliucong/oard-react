@@ -83,7 +83,7 @@ dist6a = concept_pair_dist %>%
   gather(key = 'stat',value = value,chisquare_m,odds_ratio_m,jaccard_index_m) %>%
   mutate(stat = as.factor(stat)) %>% 
   mutate(distribution = as.factor(distribution))
-levels(dist6a$stat) = c("Chi Square (log)", "Jaccard Index (log)", " Odds ratio (log)")
+levels(dist6a$stat) = c("Chi-squared (log)", "Jaccard index (log)", " Odds ratio (log)")
 
 figa = dist6a %>%
   ggplot(aes(y = value,x = distribution,color = distribution)) + 
@@ -93,7 +93,7 @@ figa = dist6a %>%
   ylab("") + 
   xlab("") + 
   scale_color_viridis_d() +
-  labs(color='Annotation Status') +
+  labs(color='Annotation status') +
   theme(plot.title = element_text(hjust = 0.5), legend.position = "right",axis.text.x = element_blank())
 
 ##################
@@ -113,9 +113,9 @@ wilcox_odds_ratio = concept_pair_dist[,if (.N > 100L) .(p = wilcox.test(odds_rat
 wilcox_jaccard_index = concept_pair_dist[,if (.N > 100L) .(p = wilcox.test(jaccard_index ~ distribution,
                                                                            exact = FALSE,alternative = "greater")$p.value),by = concept_id_2]
 
-wilcox_chisquare[,stat := "Chi Square"]
+wilcox_chisquare[,stat := "Chi-squared"]
 wilcox_odds_ratio[,stat := "Odds ratio"]
-wilcox_jaccard_index[,stat := "Jaccard Index"]
+wilcox_jaccard_index[,stat := "Jaccard index"]
 wilcox_p = rbind(wilcox_chisquare,wilcox_odds_ratio,wilcox_jaccard_index)
 figb = wilcox_p %>% 
   ggplot(aes(x = "", y = -log10(p),color = as.factor(stat))) +
@@ -150,7 +150,7 @@ dist6b = dist6b %>%
   gather(key = 'stat',value = value,chisquare_d,odds_ratio_d,jaccard_index_d) %>%
   select(concept_id_2,Evidence,stat,value) %>%
   mutate(stat = as.factor(stat))
-levels(dist6b$stat) = c("Chi Square (log)", "Jaccard Index (log)", " Odds ratio (log)")
+levels(dist6b$stat) = c("Chi-squared (log)", "Jaccard index (log)", " Odds ratio (log)")
 # IEA (inferred from electronic annotation)
 # PCS published clinical study
 # TAS “traceable author statement”,
@@ -188,7 +188,7 @@ dist6c = dist6c %>%
   select(concept_id_2,Frequency,stat,value) %>%
   mutate(stat = as.factor(stat)) %>%
   mutate(Frequency = as.factor(Frequency))
-levels(dist6c$stat) = c("Chi Square (log)", "Jaccard Index (log)", " Odds ratio (log)")
+levels(dist6c$stat) = c("Chi-squared (log)", "Jaccard index (log)", " Odds ratio (log)")
 levels(dist6c$Frequency) = c("Very frequent","Frequent","Occasional","Very rare")
 figd = dist6c %>%
   ggplot(aes(y = value,color = Frequency, x= "")) + 

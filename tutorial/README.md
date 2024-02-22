@@ -28,3 +28,19 @@
 
 ### Select your domain and return
 - When in the mode of returning most frequency or most associated concepts, you can specific the domain of concepts you want to return; you can specify the number of hits you want to return
+
+
+## Examples
+### Example 1 - find single concept frequency for muscle weakness
+![example 1](./example-1.png)
+
+### Example 2 - find most associated (ranked by obs/exp ratio) diseases with muscle weakness and skeletal muscle atrophy
+![example 2](./example-2.png)
+
+### Example 3 - find co-occurrence frequency of a concept pair of muscle weakness and Duchenne muscular dystrophy
+![example 3](./example-3.png)
+
+### Example 4 - find relative frequency of muscle weakness in duchenne muscular dystrophy patients
+![example 4](./example-4.png)
+
+

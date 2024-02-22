@@ -86,7 +86,7 @@ fig2a = hitCountDf %>%
   mutate(number_of_pts = recode_factor(hpo_count_bin, "(-Inf,9]" = "< 10", "(9, Inf]" = ">= 10")) %>%
   ggplot(aes(fill=dataset, y=count_of_hpos, x=number_of_pts)) +
   geom_bar(position="dodge", stat="identity") + 
-  xlab("Number of patients in the dataset") +
+  xlab("Number of individuals in the dataset") +
   ylab("Number of HPO concepts") + 
   scale_fill_viridis_d(name="Dataset",
                       breaks=c("1", "2", "3"),
@@ -110,7 +110,7 @@ fig2b = subHitCountDf %>%
   ggplot(aes(y=ratio,x=hp_name,group = as.factor(dataset_id))) +
   geom_point(aes(shape = as.factor(dataset_id), color = as.factor(dataset_id), size = no_hits+hits)) +
   xlab("") +
-  ylab("Ratio of HPO concepts >= 10 pts") + 
+  ylab("Ratio of HPO concepts >= 10 individuals") + 
   scale_shape_discrete(name="Dataset",
                        breaks=c(1, 2, 3),
                        labels=c("CUIMC/OHDSI", "CUIMC/Notes", "CHOP/Notes")) + 
